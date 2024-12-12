@@ -1,20 +1,9 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 4.16"
-    }
-  }
-
-  required_version = ">= 1.2.0"
-}
-
 provider "aws" {
-  region  = "ap-east-1"
+  region  = var.aws_region
 }
 
 locals {
-  instance_name = "awshk1"
+  instance_name = var.tailscale_instance_name
 }
 
 # networking

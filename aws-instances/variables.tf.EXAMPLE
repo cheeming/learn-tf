@@ -1,3 +1,15 @@
+variable "aws_region" {
+    description = "The AWS region"
+    type        = string
+    default     = "ap-east-1"  # hong kong
+}
+
+variable "tailscale_instance_name" {
+    description = "The server instance name"
+    type        = string
+    default     = "awshk1"
+}
+
 variable "public_key_id_aws" {
     description = "The public key for the key pair used to SSH into the server"
     type        = string
