@@ -1,0 +1,6 @@
+
+Host awshk1
+    Hostname 18.162.143.136
+    User ubuntu
+    IdentityFile ~/.ssh/id_aws
+
