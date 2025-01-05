@@ -17,3 +17,13 @@ output "hk_instance_public_ip" {
   description = "Public IP address of the EC2 instance"
   value       = module.tailscale_server_hongkong.instance_public_ip
 }
+
+output "sk_instance_id" {
+  description = "ID of the EC2 instance"
+  value       = module.tailscale_server_seoul.instance_id
+}
+
+output "sk_instance_public_ip" {
+  description = "Public IP address of the EC2 instance"
+  value       = module.tailscale_server_seoul.instance_public_ip
+}

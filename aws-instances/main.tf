@@ -19,3 +19,12 @@ module "tailscale_server_hongkong" {
   instance_name = "awshk1"
   ami_id_ubuntu = "ami-096a8f4ba68bb4fdf"
 }
+
+module "tailscale_server_seoul" {
+  source = "./modules/tailscale-exit-node"
+
+  aws_region        = "ap-northeast-2"
+  public_key_id_aws = var.public_key_id_aws
+  instance_name = "awsseoul1"
+  ami_id_ubuntu = "ami-05a03364f8ca05a04"
+}
