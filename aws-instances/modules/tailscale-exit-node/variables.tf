@@ -18,3 +18,9 @@ variable "ami_id_ubuntu" {
     description = "The AMI for the server, preferably Ubuntu arm64 LTS"
     type        = string
 }
+
+variable "availability_zone" {
+    description = "(Optional) Specify a specific AZ because some instance types are only available in specific AZs"
+    type        = string
+    default     = null
+}

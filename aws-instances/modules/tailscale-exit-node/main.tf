@@ -15,6 +15,7 @@ resource "aws_vpc" "vpc_tailscale" {
 resource "aws_subnet" "subnet_tailscale" {
   vpc_id     = aws_vpc.vpc_tailscale.id
   cidr_block = "10.0.0.0/24"
+  availability_zone = var.availability_zone
 
   tags = {
     Name = "subnet_tailscale"
