@@ -38,3 +38,12 @@ module "tailscale_server_tokyo" {
   ami_id_ubuntu = "ami-0329c152b4ffaa305"
   availability_zone = "ap-northeast-1b"
 }
+
+module "tailscale_server_singapore" {
+  source = "./modules/tailscale-exit-node"
+
+  aws_region        = "ap-southeast-1"
+  public_key_id_aws = var.public_key_id_aws
+  instance_name = "awssg1"
+  ami_id_ubuntu = "ami-0c2e5288624699cd8"
+}

@@ -51,34 +51,42 @@ resource "aws_route_table_association" "rta_subnet_tailscale" {
 
 # security
 
-resource "aws_security_group" "sg_only_ssh" {
-  name        = "sg_only_ssh"
-  description = "Allow SSH inbound traffic and all outbound traffic"
+resource "aws_security_group" "sg_ssh_proxy_vpn" {
+  name        = "sg_ssh_proxy_vpn"
+  description = "Allow SSH and Proxy/VPN related ports inbound traffic and all outbound traffic"
   vpc_id      = aws_vpc.vpc_tailscale.id
 
   tags = {
-    Name = "sg_only_ssh"
+    Name = "sg_ssh_proxy_vpn"
   }
 }
 
 resource "aws_vpc_security_group_ingress_rule" "allow_in_ipv4_only_ssh" {
-  security_group_id = aws_security_group.sg_only_ssh.id
+  security_group_id = aws_security_group.sg_ssh_proxy_vpn.id
   cidr_ipv4         = "0.0.0.0/0"
   from_port         = 22
   ip_protocol       = "tcp"
   to_port           = 22
 }
 
-resource "aws_vpc_security_group_ingress_rule" "allow_in_ipv4_shadowsocks" {
-  security_group_id = aws_security_group.sg_only_ssh.id
+resource "aws_vpc_security_group_ingress_rule" "allow_in_ipv4_only_shadowsocks_tcp" {
+  security_group_id = aws_security_group.sg_ssh_proxy_vpn.id
   cidr_ipv4         = "0.0.0.0/0"
   from_port         = 8488
   ip_protocol       = "tcp"
   to_port           = 8488
 }
 
+resource "aws_vpc_security_group_ingress_rule" "allow_in_ipv4_only_shadowsocks_udp" {
+  security_group_id = aws_security_group.sg_ssh_proxy_vpn.id
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 8488
+  ip_protocol       = "udp"
+  to_port           = 8488
+}
+
 resource "aws_vpc_security_group_egress_rule" "allow_eg_ipv4_all" {
-  security_group_id = aws_security_group.sg_only_ssh.id
+  security_group_id = aws_security_group.sg_ssh_proxy_vpn.id
   cidr_ipv4         = "0.0.0.0/0"
   ip_protocol       = "-1" # semantically equivalent to all ports
 }
@@ -95,7 +103,7 @@ resource "aws_instance" "ec2_server" {
   instance_type = "t4g.nano"
   associate_public_ip_address = true
   key_name = aws_key_pair.id_aws.id
-  vpc_security_group_ids = [aws_security_group.sg_only_ssh.id]
+  vpc_security_group_ids = [aws_security_group.sg_ssh_proxy_vpn.id]
   subnet_id = aws_subnet.subnet_tailscale.id
 
   tags = {
