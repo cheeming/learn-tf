@@ -69,6 +69,14 @@ resource "aws_vpc_security_group_ingress_rule" "allow_in_ipv4_only_ssh" {
   to_port           = 22
 }
 
+resource "aws_vpc_security_group_ingress_rule" "allow_in_ipv4_shadowsocks" {
+  security_group_id = aws_security_group.sg_only_ssh.id
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 8488
+  ip_protocol       = "tcp"
+  to_port           = 8488
+}
+
 resource "aws_vpc_security_group_egress_rule" "allow_eg_ipv4_all" {
   security_group_id = aws_security_group.sg_only_ssh.id
   cidr_ipv4         = "0.0.0.0/0"
