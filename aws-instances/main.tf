@@ -2,6 +2,7 @@ provider "aws" {
   region  = "us-east-1"
 }
 
+/*
 module "tailscale_server_malaysia" {
   source = "./modules/tailscale-exit-node"
 
@@ -10,6 +11,7 @@ module "tailscale_server_malaysia" {
   instance_name = "awsmy1"
   ami_id_ubuntu = "ami-042b35500928461d5"
 }
+*/
 
 module "tailscale_server_hongkong" {
   source = "./modules/tailscale-exit-node"
@@ -20,6 +22,7 @@ module "tailscale_server_hongkong" {
   ami_id_ubuntu = "ami-096a8f4ba68bb4fdf"
 }
 
+/*
 module "tailscale_server_seoul" {
   source = "./modules/tailscale-exit-node"
 
@@ -28,6 +31,7 @@ module "tailscale_server_seoul" {
   instance_name = "awsseoul1"
   ami_id_ubuntu = "ami-05a03364f8ca05a04"
 }
+*/
 
 module "tailscale_server_tokyo" {
   source = "./modules/tailscale-exit-node"
@@ -39,6 +43,7 @@ module "tailscale_server_tokyo" {
   availability_zone = "ap-northeast-1b"
 }
 
+/*
 module "tailscale_server_singapore" {
   source = "./modules/tailscale-exit-node"
 
@@ -47,3 +52,4 @@ module "tailscale_server_singapore" {
   instance_name = "awssg1"
   ami_id_ubuntu = "ami-0c2e5288624699cd8"
 }
+*/
