@@ -30,3 +30,16 @@ resource "aws_route53_record" "cname_validation" {
   records = [each.value.record]
   ttl     = 60
 }
+
+// create A record that points to the s3 bucket
+resource "aws_route53_record" "alias_cf_root" {
+  zone_id = aws_route53_zone.tmpsc_net.zone_id
+  name    = "tmpsc.net"
+  type    = "A"
+  alias {
+    name = aws_s3_bucket_website_configuration.tmpsc_net_root.website_domain
+    zone_id = aws_s3_bucket.tmpsc_net_root.hosted_zone_id
+    evaluate_target_health = false
+  }
+}
+

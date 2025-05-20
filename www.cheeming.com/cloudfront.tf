@@ -69,3 +69,18 @@ resource "aws_cloudfront_distribution" "www_tmpsc_net_cf" {
     aws_route53_record.cname_validation
   ]
 }
+
+// https://repost.aws/knowledge-center/redirect-domain-route-53
+// create empty s3 bucket that hosts root/apex domain that automatically redirects to "www" subdomain
+resource "aws_s3_bucket" "tmpsc_net_root" {
+  bucket = "tmpsc.net"
+}
+
+resource "aws_s3_bucket_website_configuration" "tmpsc_net_root" {
+  bucket = aws_s3_bucket.tmpsc_net_root.id
+
+  redirect_all_requests_to {
+    protocol = "https"
+    host_name = "www.tmpsc.net"
+  }
+}
