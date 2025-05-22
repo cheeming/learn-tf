@@ -46,6 +46,7 @@ resource "aws_cloudfront_origin_access_control" "www_cheeming_com_cf_oac" {
 resource "aws_cloudfront_distribution" "www_cheeming_com_cf" {
   origin {
     domain_name              = aws_s3_bucket.www_cheeming_com.bucket_regional_domain_name
+    // FIXME: due to s3 website hosting, this is not really needed
     origin_access_control_id = aws_cloudfront_origin_access_control.www_cheeming_com_cf_oac.id
     origin_id                = local.s3_origin_id
   }

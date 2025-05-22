@@ -19,6 +19,7 @@ resource "aws_cloudfront_origin_access_control" "www_tmpsc_net_cf_oac" {
 resource "aws_cloudfront_distribution" "www_tmpsc_net_cf" {
   origin {
     domain_name              = aws_s3_bucket.www_cheeming_com.bucket_regional_domain_name
+    // FIXME: due to s3 website hosting, this is not really needed
     origin_access_control_id = aws_cloudfront_origin_access_control.www_tmpsc_net_cf_oac.id
     origin_id                = local.s3_origin_id
   }
@@ -100,7 +101,7 @@ resource "aws_cloudfront_distribution" "tmpsc_net_cf" {
 
   origin {
     domain_name              = aws_s3_bucket_website_configuration.tmpsc_net_root.website_endpoint
-    origin_id                = local.s3_origin_id // ? need to double check if I need to change this.
+    origin_id                = local.s3_origin_id
 
     custom_origin_config {
       http_port               = 80
@@ -130,7 +131,7 @@ resource "aws_cloudfront_distribution" "tmpsc_net_cf" {
       }
     }
 
-    viewer_protocol_policy = "redirect-to-https"
+    viewer_protocol_policy = "allow-all"
     min_ttl                = 0
     default_ttl            = 3600
     max_ttl                = 86400

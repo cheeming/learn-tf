@@ -37,8 +37,6 @@ resource "aws_route53_record" "alias_cf_root" {
   name    = "tmpsc.net"
   type    = "A"
   alias {
-    //name = aws_s3_bucket_website_configuration.tmpsc_net_root.website_domain
-    //zone_id = aws_s3_bucket.tmpsc_net_root.hosted_zone_id
     name = aws_cloudfront_distribution.tmpsc_net_cf.domain_name
     zone_id = aws_cloudfront_distribution.tmpsc_net_cf.hosted_zone_id
     evaluate_target_health = false
