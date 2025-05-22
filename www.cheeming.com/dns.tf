@@ -59,3 +59,28 @@ resource "aws_route53_record" "cname_validation_tmpsc_net_root" {
   records = [each.value.record]
   ttl     = 60
 }
+
+// dns records for email
+resource "aws_route53_record" "tmpsc_mx" {
+  zone_id = aws_route53_zone.tmpsc_net.zone_id
+  type    = "MX"
+  name    = "tmpsc.net"
+  records = ["10 mx01.mail.icloud.com.", "10 mx02.mail.icloud.com."]
+  ttl     = 60
+}
+
+resource "aws_route53_record" "tmpsc_txt" {
+  zone_id = aws_route53_zone.tmpsc_net.zone_id
+  type    = "TXT"
+  name    = "tmpsc.net"
+  records = ["apple-domain=rqjluaoy8cY0kNmM", "v=spf1 include:icloud.com ~all"]
+  ttl     = 60
+}
+
+resource "aws_route53_record" "tmpsc_dkim" {
+  zone_id = aws_route53_zone.tmpsc_net.zone_id
+  type    = "CNAME"
+  name    = "sig1._domainkey"
+  records = ["sig1.dkim.tmpsc.net.at.icloudmailadmin.com."]
+  ttl     = 60
+}
