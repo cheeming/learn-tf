@@ -83,3 +83,108 @@ resource "aws_cloudfront_distribution" "www_cheeming_com_cf" {
   }
 }
 
+resource "aws_s3_bucket" "nextjs_cheeming_com" {
+  bucket = "nextjs.cheeming.com"
+}
+
+resource "aws_s3_bucket_website_configuration" "nextjs_cheeming_com" {
+  bucket = aws_s3_bucket.nextjs_cheeming_com.id
+
+  index_document {
+    suffix = "index.html"
+  }
+
+  error_document {
+    key = "404.html"
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "nextjs_cheeming_com" {
+  bucket = aws_s3_bucket.nextjs_cheeming_com.id
+  block_public_acls = false
+}
+
+resource "aws_s3_bucket_ownership_controls" "nextjs_cheeming_com" {
+  bucket = aws_s3_bucket.nextjs_cheeming_com.id
+
+  rule {
+    object_ownership = "ObjectWriter"
+  }
+}
+
+resource "aws_s3_bucket_acl" "nextjs_cheeming_com" {
+  bucket = aws_s3_bucket.nextjs_cheeming_com.id
+  acl    = "public-read"
+
+  depends_on = [
+    aws_s3_bucket_ownership_controls.nextjs_cheeming_com,
+    aws_s3_bucket_public_access_block.nextjs_cheeming_com,
+  ]
+}
+
+resource "aws_acm_certificate" "nextjs_cheeming_com_cert" {
+  domain_name       = "nextjs.cheeming.com"
+  validation_method = "DNS"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  provider = aws.us-east-1
+}
+
+// NOTE: DNS configs is managed in active-domain.com for cheeming.com
+// 2025-06-03: CNAME record with value aws_cloudfront_distribution.nextjs_cheeming_com_cf.domain_name 
+resource "aws_cloudfront_distribution" "nextjs_cheeming_com_cf" {
+  origin {
+    domain_name              = aws_s3_bucket_website_configuration.nextjs_cheeming_com.website_endpoint
+    origin_id                = local.s3_origin_id
+
+    custom_origin_config {
+      http_port               = 80
+      https_port              = 443
+      origin_protocol_policy  = "http-only"
+      origin_ssl_protocols    = ["TLSv1.2"]
+    }
+  }
+
+  enabled             = true
+  is_ipv6_enabled     = true
+  comment             = "To host nextjs.cheeming.com"
+  default_root_object = "index.html"
+
+  aliases = ["nextjs.cheeming.com"]
+
+  default_cache_behavior {
+    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = local.s3_origin_id
+
+    forwarded_values {
+      query_string = false
+
+      cookies {
+        forward = "none"
+      }
+    }
+
+    viewer_protocol_policy = "redirect-to-https"
+    min_ttl                = 0
+    default_ttl            = 3600
+    max_ttl                = 86400
+  }
+
+  price_class = "PriceClass_All"
+
+  restrictions {
+    geo_restriction {
+      restriction_type  = "none"
+      locations         = []
+    }
+  }
+
+  viewer_certificate {
+    acm_certificate_arn = aws_acm_certificate.nextjs_cheeming_com_cert.arn
+    ssl_support_method  = "sni-only"
+  }
+}
