@@ -11,12 +11,14 @@ locals {
   ss_binaries = [
     "shadowsocks2-linux-arm64",
     "v2ray-plugin_linux_arm64",
+    "update-ddns",
   ]
   ss_files_s3 = concat(local.ss_binaries, [
     "limits.conf",
     "sysctl.conf",
     "tmpsc.net/tmpsc_net.cer",
     "tmpsc.net/tmpsc_net.key",
+    "noip-duc_3.3.0_arm64.deb",
   ])
 }
 
@@ -39,8 +41,13 @@ locals {
   })
 
   init_script_content = templatefile("files/init.sh.tftpl", {
-    SS_FILES    = concat(local.ss_files_s3, ["start-ss"])
+    SS_FILES    = concat(local.ss_files_s3, ["start-ss", "noip-duc.env"])
     SS_BINARIES = concat(local.ss_binaries, ["start-ss"])
+  })
+
+  noip_env_content = templatefile("files/noip-duc.env.tftpl", {
+    USERNAME    = var.noip_username
+    PASSWORD    = var.noip_password
   })
 }
 
@@ -49,6 +56,13 @@ resource "aws_s3_object" "ss_start_script" {
   key = "start-ss"
   content = local.ss_start_script_content
   etag = md5(local.ss_start_script_content)
+}
+
+resource "aws_s3_object" "noip_env" {
+  bucket = aws_s3_bucket.vpn_configs.id
+  key = "noip-duc.env"
+  content = local.noip_env_content
+  etag = md5(local.noip_env_content)
 }
 
 module "tailscale_server_tokyo" {

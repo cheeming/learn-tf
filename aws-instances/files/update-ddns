@@ -1,0 +1,5 @@
+#!/bin/bash
+
+set -a;
+source /home/ubuntu/noip-duc.env;
+noip-duc --once -v >> /home/ubuntu/noip-duc.log 2>&1

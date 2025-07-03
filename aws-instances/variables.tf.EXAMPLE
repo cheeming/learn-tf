@@ -29,3 +29,16 @@ variable "ss_key_file" {
     type        = string
     default     = "/home/ubuntu/tmpsc.net/tmpsc_net.key"
 }
+
+variable "noip_username" {
+    description = "The username for No-IP"
+    type        = string
+    default     = "USERNAME"
+}
+
+variable "noip_password" {
+    description = "The password for No-IP"
+    type        = string
+    sensitive   = true
+    default     = "12345678"
+}

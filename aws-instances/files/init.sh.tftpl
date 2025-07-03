@@ -6,6 +6,7 @@ echo "init.sh --- START"
 
 # INSTALL DEPENDENCIES
 snap install aws-cli --classic
+apt remove -y snapd unattended-upgrades
 
 # COPY FILES FROM S3
 cd /home/ubuntu/
@@ -20,17 +21,26 @@ for FILE in "$${BINARIES[@]}"; do
     chmod 754 "$${FILE}"
 done
 
-# ADD CRONTAB
+# INSTALL NOIP binary
+apt install /home/ubuntu/noip-duc_3.3.0_arm64.deb
 
-# shutdown server at 10pm and 12am to save costs
-(crontab -l 2>/dev/null; echo "0 14 * * * shutdown -h now") | crontab -
-(crontab -l 2>/dev/null; echo "0 16 * * * shutdown -h now") | crontab -
+# UPDATE CONFIGS
+cp /home/ubuntu/limits.conf /etc/security/limits.conf
+
+cp /home/ubuntu/sysctl.conf /etc/sysctl.conf
+sysctl -p /etc/sysctl.conf
+
+# ADD CRONTAB
 
 # start shadowsocks on machine start
 (crontab -l 2>/dev/null; echo "@reboot /home/ubuntu/start-ss &") | crontab -
 
-# FIXME: add dynamic dns stuff
-# FIXME: update the limits, networking related configs
+# update Dynamic DNS
+(crontab -l 2>/dev/null; echo "@reboot /home/ubuntu/update-ddns") | crontab -
+
+# shutdown server at 10pm and 12am to save costs
+(crontab -l 2>/dev/null; echo "0 14 * * * shutdown -h now") | crontab -
+(crontab -l 2>/dev/null; echo "0 16 * * * shutdown -h now") | crontab -
 
 echo "init.sh --- DONE (reboot after this)"
 
