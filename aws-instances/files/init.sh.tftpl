@@ -1,0 +1,38 @@
+#!/bin/bash
+
+exec > >(tee -a /var/log/init.log) 2>&1
+
+echo "init.sh --- START"
+
+# INSTALL DEPENDENCIES
+snap install aws-cli --classic
+
+# COPY FILES FROM S3
+cd /home/ubuntu/
+FILES=(%{ for SS_FILE in SS_FILES ~} "${SS_FILE}" %{ endfor ~})
+for FILE in "$${FILES[@]}"; do
+    aws s3 cp "s3://cheems-vpn-configs/$${FILE}" "$${FILE}"
+done
+
+# UPDATE THE PERMISSIONS FOR BINARIES
+BINARIES=(%{ for SS_BINARY in SS_BINARIES ~} "${SS_BINARY}" %{ endfor ~})
+for FILE in "$${BINARIES[@]}"; do
+    chmod 754 "$${FILE}"
+done
+
+# ADD CRONTAB
+
+# shutdown server at 10pm and 12am to save costs
+(crontab -l 2>/dev/null; echo "0 14 * * * shutdown -h now") | crontab -
+(crontab -l 2>/dev/null; echo "0 16 * * * shutdown -h now") | crontab -
+
+# start shadowsocks on machine start
+(crontab -l 2>/dev/null; echo "@reboot /home/ubuntu/start-ss &") | crontab -
+
+# FIXME: add dynamic dns stuff
+# FIXME: update the limits, networking related configs
+
+echo "init.sh --- DONE (reboot after this)"
+
+# restart machine to test crontab
+reboot

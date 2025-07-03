@@ -24,3 +24,15 @@ variable "availability_zone" {
     type        = string
     default     = null
 }
+
+variable "user_data" {
+    description = "(Optional) Script to be executed when the instance starts"
+    type        = string
+    default     = null
+}
+
+variable "s3_bucket_arn" {
+    description = "S3 bucket to store scripts, binaries and etc"
+    type        = string
+    default     = null
+}

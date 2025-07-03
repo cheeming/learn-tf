@@ -1,0 +1,1 @@
+SHADOWSOCKS_SF_CAPACITY=1e6 SHADOWSOCKS_SF_FPR=1e-6 SHADOWSOCKS_SF_SLOT=10 /home/ubuntu/shadowsocks2-linux-arm64 -s 'ss://AEAD_CHACHA20_POLY1305:${PASSWORD}@:443' -verbose -plugin /home/ubuntu/v2ray-plugin_linux_arm64 -plugin-opts "server" -plugin-opts "server;tls;mode=websocket;path=/ws;host=${DOMAIN_NAME};cert=${CERT_FILE};key=${KEY_FILE}" > /home/ubuntu/ss.log 2>&1

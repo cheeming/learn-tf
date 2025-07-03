@@ -113,8 +113,58 @@ resource "aws_instance" "ec2_server" {
   key_name = aws_key_pair.id_aws.id
   vpc_security_group_ids = [aws_security_group.sg_ssh_proxy_vpn.id]
   subnet_id = aws_subnet.subnet_tailscale.id
+  user_data = var.user_data
+
+  iam_instance_profile = aws_iam_instance_profile.ec2_server.name
 
   tags = {
     Name = var.instance_name
   }
+}
+
+# IAM role
+
+resource "aws_iam_policy" "ec2_permission_boundary" {
+  name   = "ec2_permission_boundary"
+  policy = <<EOF
+{
+  "Version":"2012-10-17",
+  "Statement":[
+    {
+      "Effect":"Allow",
+      "Action":["s3:Get*","s3:List*"],
+      "Resource":[
+        "${var.s3_bucket_arn}",
+        "${var.s3_bucket_arn}/*"
+      ]
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role" "ec2_server" {
+  permissions_boundary = aws_iam_policy.ec2_permission_boundary.arn
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": { "Service": "ec2.amazonaws.com" },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "ec2_server_s3_policy" {
+  role       = aws_iam_role.ec2_server.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+}
+
+resource "aws_iam_instance_profile" "ec2_server" {
+  name = "ec2_server_instance_profile"
+  role = aws_iam_role.ec2_server.name
 }

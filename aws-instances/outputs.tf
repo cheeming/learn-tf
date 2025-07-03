@@ -17,4 +17,3 @@ output "us_instance_public_ip" {
   description = "Public IP address of the EC2 instance"
   value       = module.tailscale_server_us.instance_public_ip
 }
-
