@@ -34,5 +34,5 @@ variable "user_data" {
 variable "s3_bucket_arn" {
     description = "S3 bucket to store scripts, binaries and etc"
     type        = string
-    default     = null
+    default     = ""
 }

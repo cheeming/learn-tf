@@ -65,33 +65,23 @@ resource "aws_s3_object" "noip_env" {
   etag = md5(local.noip_env_content)
 }
 
-module "tailscale_server_tokyo" {
-  source = "./modules/tailscale-exit-node"
-
-  aws_region        = "ap-northeast-1"
-  public_key_id_aws = var.public_key_id_aws
-  instance_name = "awstokyo1"
-  ami_id_ubuntu = "ami-0329c152b4ffaa305"
-  availability_zone = "ap-northeast-1b"
-}
-
 module "tailscale_server_us" {
   source = "./modules/tailscale-exit-node"
 
   aws_region        = "us-east-1"
   public_key_id_aws = var.public_key_id_aws
-  instance_name = "awsus1"
-  ami_id_ubuntu = "ami-07041441b708acbd6"
+  instance_name     = "awsus1"
+  ami_id_ubuntu     = "ami-07041441b708acbd6"
   availability_zone = "us-east-1a"
 }
 
-module "tailscale_server_sg" {
+module "shadowsock_tokyo" {
   source = "./modules/tailscale-exit-node"
 
-  aws_region        = "ap-southeast-1"
+  aws_region        = "ap-northeast-1"
   public_key_id_aws = var.public_key_id_aws
-  instance_name = "awssg1"
-  ami_id_ubuntu = "ami-06f87694403c8ae6a"
+  instance_name     = "awstokyo1"
+  ami_id_ubuntu     = "ami-0cef62348b8426830"
 
   user_data = local.init_script_content
   s3_bucket_arn = aws_s3_bucket.vpn_configs.arn

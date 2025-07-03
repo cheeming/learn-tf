@@ -6,7 +6,8 @@ echo "init.sh --- START"
 
 # INSTALL DEPENDENCIES
 snap install aws-cli --classic
-apt remove -y snapd unattended-upgrades
+snap remove amazon-ssm-agent
+apt remove -y unattended-upgrades
 
 # COPY FILES FROM S3
 cd /home/ubuntu/
