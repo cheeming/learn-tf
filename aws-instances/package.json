@@ -1,0 +1,16 @@
+{
+  "name": "aws-instances",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test_ci": "gitlab-ci-local --variables-file .gitlab-ci-local-variables.env"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.11.1",
+  "devDependencies": {
+    "gitlab-ci-local": "^4.61.0"
+  }
+}
