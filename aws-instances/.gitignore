@@ -1,8 +1,0 @@
-variables.tf
-
-*.tfstate*
-
-node_modules/
-
-.gitlab-ci-local-variables.env
-.gitlab-ci-local/

@@ -3,5 +3,11 @@
 .terraform
 .terraform.*
 *.tfstate
-*.tfstate.backup
+*.tfstate.*backup
 
+variables.tf
+
+node_modules/
+
+.gitlab-ci-local-variables.env
+.gitlab-ci-local/
