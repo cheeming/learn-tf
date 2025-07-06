@@ -13,3 +13,15 @@ tf_plan:
   script:
     - terraform plan -target=module.shadowsock_tokyo.aws_instance.ec2_server
   when: manual
+
+tf_apply:
+  extends: tf_plan
+  stage: deploy
+  script:
+    - terraform apply -auto-approve -target=module.shadowsock_tokyo.aws_instance.ec2_server
+
+tf_destroy:
+  extends: tf_plan
+  stage: deploy
+  script:
+    - terraform destroy -auto-approve -target=module.shadowsock_tokyo.aws_instance.ec2_server
