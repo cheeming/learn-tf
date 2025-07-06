@@ -12,12 +12,6 @@ ss_tf_plan:
     - terraform init -backend-config="address=https://gitlab.com/api/v4/projects/71332047/terraform/state/${TF_STATE_NAME}" -backend-config="lock_address=https://gitlab.com/api/v4/projects/71332047/terraform/state/${TF_STATE_NAME}/lock" -backend-config="unlock_address=https://gitlab.com/api/v4/projects/71332047/terraform/state/${TF_STATE_NAME}/lock" -backend-config="username=${TF_BACKEND_USERNAME}" -backend-config="password=${CI_JOB_TOKEN}" -backend-config="lock_method=POST" -backend-config="unlock_method=DELETE" -backend-config="retry_wait_min=5"
   script:
     - terraform plan -target=module.shadowsock_tokyo.aws_instance.ec2_server
-  cache:
-    - key: 
-        files:
-          - aws-instances/.terraform.lock.hcl
-      paths:
-        - aws-instances/.terraform/
   when: manual
 
 ss_tf_apply:
