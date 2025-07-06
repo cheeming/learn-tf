@@ -31,10 +31,6 @@ ss_tf_apply_test:
   stage: deploy
   script:
     - ./scripts/test_connect_ss.sh `terraform output -raw jp_instance_public_ip`
-  when: delayed
-  start_in: 5 minutes
-  needs:
-    - ss_tf_apply
 
 ss_tf_destroy:
   extends: ss_tf_plan
