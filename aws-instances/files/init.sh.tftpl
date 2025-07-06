@@ -2,7 +2,6 @@
 
 exec > >(tee -a /var/log/init.log) 2>&1
 
-date
 echo "init.sh --- START"
 
 # INSTALL DEPENDENCIES
@@ -45,7 +44,6 @@ sysctl -p /etc/sysctl.conf
 (crontab -l 2>/dev/null; echo "0 16 * * * shutdown -h now") | crontab -
 
 echo "init.sh --- DONE (reboot after this)"
-date
 
 # restart machine to test crontab
 reboot
