@@ -1,4 +1,4 @@
-tf_plan:
+ss_tf_plan:
   stage: build
   image:
     name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/hashicorp/terraform:1.12
@@ -14,14 +14,14 @@ tf_plan:
     - terraform plan -target=module.shadowsock_tokyo.aws_instance.ec2_server
   when: manual
 
-tf_apply:
-  extends: tf_plan
+ss_tf_apply:
+  extends: ss_tf_plan
   stage: deploy
   script:
     - terraform apply -auto-approve -target=module.shadowsock_tokyo.aws_instance.ec2_server
 
-tf_destroy:
-  extends: tf_plan
+ss_tf_destroy:
+  extends: ss_tf_plan
   stage: deploy
   script:
     - terraform destroy -auto-approve -target=module.shadowsock_tokyo.aws_instance.ec2_server
