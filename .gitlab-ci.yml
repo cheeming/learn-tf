@@ -28,7 +28,7 @@ ss_tf_apply:
   script:
     - terraform apply -auto-approve -target=module.shadowsock_tokyo.aws_instance.ec2_server
   rules:
-    - if: $CI_PIPELINE_SOURCE == "schedule" && '"$[[ inputs.schedule_job ]]" == "ss_tf_apply"'
+    - if: $CI_PIPELINE_SOURCE == "schedule" && "$[[ inputs.schedule_job ]]" == "ss_tf_apply"
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: never
     - when: manual
@@ -39,7 +39,7 @@ ss_tf_apply_test:
   script:
     - ./scripts/test_connect_ss.sh `terraform output -raw jp_instance_public_ip`
   rules:
-    - if: $CI_PIPELINE_SOURCE == "schedule" && '"$[[ inputs.schedule_job ]]" == "ss_tf_apply"'
+    - if: $CI_PIPELINE_SOURCE == "schedule" && "$[[ inputs.schedule_job ]]" == "ss_tf_apply"
       needs: ['ss_tf_apply']
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: never
@@ -51,7 +51,7 @@ ss_tf_destroy:
   script:
     - terraform destroy -auto-approve -target=module.shadowsock_tokyo.aws_instance.ec2_server
   rules:
-    - if: $CI_PIPELINE_SOURCE == "schedule" && '"$[[ inputs.schedule_job ]]" == "ss_tf_destroy"'
+    - if: $CI_PIPELINE_SOURCE == "schedule" && "$[[ inputs.schedule_job ]]" == "ss_tf_destroy"
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: never
     - when: manual
