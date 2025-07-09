@@ -41,6 +41,8 @@ ss_tf_apply_test:
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule" && "$[[ inputs.schedule_job ]]" == "ss_tf_apply"
       needs: ['ss_tf_apply']
+      when: delayed
+      start_in: 5 minutes
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: never
     - when: manual
