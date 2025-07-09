@@ -20,7 +20,6 @@ ss_tf_plan:
     - terraform plan -target=module.shadowsock_tokyo.aws_instance.ec2_server
   rules:
     - when: manual
-  allow_failure: true
 
 ss_tf_apply:
   extends: ss_tf_plan
@@ -29,6 +28,8 @@ ss_tf_apply:
     - terraform apply -auto-approve -target=module.shadowsock_tokyo.aws_instance.ec2_server
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule" && '"$[[ inputs.schedule_job ]]" == "ss_tf_apply"'
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
     - when: manual
 
 ss_tf_apply_test:
@@ -39,6 +40,8 @@ ss_tf_apply_test:
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule" && '"$[[ inputs.schedule_job ]]" == "ss_tf_apply"'
       needs: ['ss_tf_apply']
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
     - when: manual
 
 ss_tf_destroy:
@@ -48,4 +51,6 @@ ss_tf_destroy:
     - terraform destroy -auto-approve -target=module.shadowsock_tokyo.aws_instance.ec2_server
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule" && '"$[[ inputs.schedule_job ]]" == "ss_tf_destroy"'
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
     - when: manual
