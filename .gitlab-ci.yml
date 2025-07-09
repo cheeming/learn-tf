@@ -20,6 +20,7 @@ ss_tf_plan:
     - terraform plan -target=module.shadowsock_tokyo.aws_instance.ec2_server
   rules:
     - when: manual
+      allow_failure: true
 
 ss_tf_apply:
   extends: ss_tf_plan
