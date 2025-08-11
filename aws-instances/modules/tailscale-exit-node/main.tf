@@ -125,7 +125,6 @@ resource "aws_instance" "ec2_server" {
 # IAM role
 
 resource "aws_iam_policy" "ec2_permission_boundary" {
-  name   = "ec2_permission_boundary"
   policy = <<EOF
 {
   "Version":"2012-10-17",
@@ -165,6 +164,6 @@ resource "aws_iam_role_policy_attachment" "ec2_server_s3_policy" {
 }
 
 resource "aws_iam_instance_profile" "ec2_server" {
-  name = "ec2_server_instance_profile"
+  name = aws_iam_role.ec2_server.name
   role = aws_iam_role.ec2_server.name
 }
