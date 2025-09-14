@@ -63,9 +63,9 @@ resource "aws_cloudfront_distribution" "www_cheeming_com_cf" {
     }
 
     viewer_protocol_policy = "redirect-to-https"
-    min_ttl                = 0
+    min_ttl                = 3600
     default_ttl            = 3600
-    max_ttl                = 86400
+    max_ttl                = 3600
   }
 
   price_class = "PriceClass_All"
@@ -169,9 +169,9 @@ resource "aws_cloudfront_distribution" "nextjs_cheeming_com_cf" {
     }
 
     viewer_protocol_policy = "redirect-to-https"
-    min_ttl                = 0
+    min_ttl                = 3600
     default_ttl            = 3600
-    max_ttl                = 86400
+    max_ttl                = 3600
   }
 
   price_class = "PriceClass_All"

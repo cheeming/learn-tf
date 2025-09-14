@@ -45,9 +45,9 @@ resource "aws_cloudfront_distribution" "www_tmpsc_net_cf" {
     }
 
     viewer_protocol_policy = "redirect-to-https"
-    min_ttl                = 0
+    min_ttl                = 3600
     default_ttl            = 3600
-    max_ttl                = 86400
+    max_ttl                = 3600
   }
 
   price_class = "PriceClass_All"
@@ -132,9 +132,9 @@ resource "aws_cloudfront_distribution" "tmpsc_net_cf" {
     }
 
     viewer_protocol_policy = "allow-all"
-    min_ttl                = 0
+    min_ttl                = 3600
     default_ttl            = 3600
-    max_ttl                = 86400
+    max_ttl                = 3600
   }
 
   price_class = "PriceClass_All"
