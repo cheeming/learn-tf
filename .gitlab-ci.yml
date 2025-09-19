@@ -57,3 +57,35 @@ ss_tf_destroy:
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: never
     - when: manual
+
+sg_ss_tf_plan:
+  extends: ss_tf_plan
+  script:
+    - terraform plan -target=module.shadowsock_sg.aws_instance.ec2_server
+  rules:
+    - when: manual
+      allow_failure: true
+
+sg_ss_tf_apply:
+  extends: ss_tf_plan
+  stage: deploy
+  script:
+    - terraform apply -auto-approve -target=module.shadowsock_sg.aws_instance.ec2_server
+  rules:
+    - when: manual
+
+sg_ss_tf_apply_test:
+  extends: ss_tf_plan
+  stage: deploy
+  script:
+    - ./scripts/test_connect_ss.sh `terraform output -raw sg_instance_public_ip`
+  rules:
+    - when: manual
+
+sg_ss_tf_destroy:
+  extends: ss_tf_plan
+  stage: deploy
+  script:
+    - terraform destroy -auto-approve -target=module.shadowsock_sg.aws_instance.ec2_server
+  rules:
+    - when: manual

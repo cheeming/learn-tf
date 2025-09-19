@@ -76,3 +76,15 @@ module "shadowsock_tokyo" {
   user_data = local.init_script_content
   s3_bucket_arn = aws_s3_bucket.vpn_configs.arn
 }
+
+module "shadowsock_sg" {
+  source = "./modules/tailscale-exit-node"
+
+  aws_region        = "ap-southeast-1"
+  public_key_id_aws = var.public_key_id_aws
+  instance_name     = "awssg1"
+  ami_id_ubuntu     = "ami-078f840c20e30f90d"
+
+  user_data = local.init_script_content
+  s3_bucket_arn = aws_s3_bucket.vpn_configs.arn
+}
