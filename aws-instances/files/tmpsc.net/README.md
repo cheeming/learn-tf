@@ -1,1 +1,1 @@
-Please park the `*.cer` and `*.key` files here
+Please park the `fullchain.cer` and `*.key` files here
