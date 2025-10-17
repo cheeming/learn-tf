@@ -20,8 +20,9 @@ ss_tf_plan:
   script:
     - terraform plan -target=module.shadowsock_${SS_LOCATION}.aws_instance.ec2_server
   rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
     - when: manual
-      allow_failure: true
 
 ss_tf_apply:
   extends: ss_tf_plan
