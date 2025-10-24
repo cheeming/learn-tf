@@ -8,7 +8,9 @@ spec:
       default: 'tokyo'
 ---
 _ss_tf_base:
-  stage: build
+  stage: deploy
+  environment: ss_production
+  resource_group: ss_production
   image:
     name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/hashicorp/terraform:1.12
     entrypoint: [""]
@@ -26,7 +28,6 @@ _ss_tf_base:
 
 ss_tf_apply:
   extends: _ss_tf_base
-  stage: deploy
   script:
     - terraform apply -auto-approve -target=module.shadowsock_$[[ inputs.ss_location ]].aws_instance.ec2_server
   rules:
@@ -37,7 +38,6 @@ ss_tf_apply:
 
 ss_tf_destroy:
   extends: _ss_tf_base
-  stage: deploy
   script:
     - terraform destroy -auto-approve -target=module.shadowsock_$[[ inputs.ss_location ]].aws_instance.ec2_server
   rules:
