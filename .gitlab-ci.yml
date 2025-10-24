@@ -4,7 +4,7 @@ spec:
       type: string
       default: ''
 ---
-ss_tf_plan:
+_ss_tf_base:
   stage: build
   image:
     name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/hashicorp/terraform:1.12
@@ -20,12 +20,10 @@ ss_tf_plan:
   script:
     - terraform plan -target=module.shadowsock_${SS_LOCATION}.aws_instance.ec2_server
   rules:
-    - if: $CI_PIPELINE_SOURCE == "schedule"
-      when: never
-    - when: manual
+    - when: never
 
 ss_tf_apply:
-  extends: ss_tf_plan
+  extends: _ss_tf_base
   variables:
     SCHEDULE_JOB_CHECK: '${SS_LOCATION}_ss_tf_apply'
   stage: deploy
@@ -37,24 +35,8 @@ ss_tf_apply:
       when: never
     - when: manual
 
-ss_tf_apply_test:
-  extends: ss_tf_plan
-  variables:
-    SCHEDULE_JOB_CHECK: '${SS_LOCATION}_ss_tf_apply'
-  stage: deploy
-  script:
-    - ./scripts/test_connect_ss.sh `terraform output -raw jp_instance_public_ip`
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "schedule" && "$[[ inputs.schedule_job ]]" == $SCHEDULE_JOB_CHECK
-      needs: ['ss_tf_apply']
-      when: delayed
-      start_in: 5 minutes
-    - if: $CI_PIPELINE_SOURCE == "schedule"
-      when: never
-    - when: manual
-
 ss_tf_destroy:
-  extends: ss_tf_plan
+  extends: _ss_tf_base
   variables:
     SCHEDULE_JOB_CHECK: '${SS_LOCATION}_ss_tf_destroy'
   stage: deploy
@@ -66,33 +48,22 @@ ss_tf_destroy:
       when: never
     - when: manual
 
-sg_ss_tf_plan:
-  extends: ss_tf_plan
-  variables:
-    SS_LOCATION: sg
-
 sg_ss_tf_apply:
   extends: ss_tf_apply
   variables:
     SS_LOCATION: sg
 
-sg_ss_tf_apply_test:
-  extends: ss_tf_plan
-  variables:
-    SS_LOCATION: sg
-  stage: deploy
-  script:
-    - ./scripts/test_connect_ss.sh `terraform output -raw sg_instance_public_ip`
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "schedule" && "$[[ inputs.schedule_job ]]" == "sg_ss_tf_apply"
-      needs: ['sg_ss_tf_apply']
-      when: delayed
-      start_in: 5 minutes
-    - if: $CI_PIPELINE_SOURCE == "schedule"
-      when: never
-    - when: manual
-
 sg_ss_tf_destroy:
   extends: ss_tf_destroy
   variables:
     SS_LOCATION: sg
+
+us_ss_tf_apply:
+  extends: ss_tf_apply
+  variables:
+    SS_LOCATION: us
+
+us_ss_tf_destroy:
+  extends: ss_tf_destroy
+  variables:
+    SS_LOCATION: us
