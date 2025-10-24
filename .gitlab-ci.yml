@@ -3,6 +3,9 @@ spec:
     schedule_job:
       type: string
       default: ''
+    ss_location:
+      type: string
+      default: 'tokyo'
 ---
 _ss_tf_base:
   stage: build
@@ -12,58 +15,33 @@ _ss_tf_base:
   variables:
     TF_STATE_NAME: aws-instances
     TF_BACKEND_USERNAME: gitlab-ci-token
-    SS_LOCATION: tokyo
   before_script:
     - cd aws-instances
     - cp variables.tf.EXAMPLE variables.tf
     - terraform init -backend-config="address=https://gitlab.com/api/v4/projects/71332047/terraform/state/${TF_STATE_NAME}" -backend-config="lock_address=https://gitlab.com/api/v4/projects/71332047/terraform/state/${TF_STATE_NAME}/lock" -backend-config="unlock_address=https://gitlab.com/api/v4/projects/71332047/terraform/state/${TF_STATE_NAME}/lock" -backend-config="username=${TF_BACKEND_USERNAME}" -backend-config="password=${CI_JOB_TOKEN}" -backend-config="lock_method=POST" -backend-config="unlock_method=DELETE" -backend-config="retry_wait_min=5"
   script:
-    - terraform plan -target=module.shadowsock_${SS_LOCATION}.aws_instance.ec2_server
+    - terraform plan -target=module.shadowsock_$[[ inputs.ss_location ]].aws_instance.ec2_server
   rules:
     - when: never
 
 ss_tf_apply:
   extends: _ss_tf_base
-  variables:
-    SCHEDULE_JOB_CHECK: '${SS_LOCATION}_ss_tf_apply'
   stage: deploy
   script:
-    - terraform apply -auto-approve -target=module.shadowsock_${SS_LOCATION}.aws_instance.ec2_server
+    - terraform apply -auto-approve -target=module.shadowsock_$[[ inputs.ss_location ]].aws_instance.ec2_server
   rules:
-    - if: $CI_PIPELINE_SOURCE == "schedule" && "$[[ inputs.schedule_job ]]" == $SCHEDULE_JOB_CHECK
+    - if: $CI_PIPELINE_SOURCE == "schedule" && "$[[ inputs.schedule_job ]]" == 'ss_tf_apply'
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: never
     - when: manual
 
 ss_tf_destroy:
   extends: _ss_tf_base
-  variables:
-    SCHEDULE_JOB_CHECK: '${SS_LOCATION}_ss_tf_destroy'
   stage: deploy
   script:
-    - terraform destroy -auto-approve -target=module.shadowsock_${SS_LOCATION}.aws_instance.ec2_server
+    - terraform destroy -auto-approve -target=module.shadowsock_$[[ inputs.ss_location ]].aws_instance.ec2_server
   rules:
-    - if: $CI_PIPELINE_SOURCE == "schedule" && "$[[ inputs.schedule_job ]]" == $SCHEDULE_JOB_CHECK
+    - if: $CI_PIPELINE_SOURCE == "schedule" && "$[[ inputs.schedule_job ]]" == 'ss_tf_destroy'
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: never
     - when: manual
-
-sg_ss_tf_apply:
-  extends: ss_tf_apply
-  variables:
-    SS_LOCATION: sg
-
-sg_ss_tf_destroy:
-  extends: ss_tf_destroy
-  variables:
-    SS_LOCATION: sg
-
-us_ss_tf_apply:
-  extends: ss_tf_apply
-  variables:
-    SS_LOCATION: us
-
-us_ss_tf_destroy:
-  extends: ss_tf_destroy
-  variables:
-    SS_LOCATION: us
