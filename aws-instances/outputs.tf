@@ -12,3 +12,8 @@ output "sg_instance_public_ip" {
   description = "Public IP address of the EC2 instance"
   value       = module.shadowsock_sg.instance_public_ip
 }
+
+output "us_instance_public_ip" {
+  description = "Public IP address of the EC2 instance"
+  value       = module.shadowsock_us.instance_public_ip
+}
