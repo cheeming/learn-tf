@@ -84,3 +84,11 @@ resource "aws_route53_record" "tmpsc_dkim" {
   records = ["sig1.dkim.tmpsc.net.at.icloudmailadmin.com."]
   ttl     = 60
 }
+
+resource "aws_route53_record" "tmpsc_ss_jp" {
+  zone_id = aws_route53_zone.tmpsc_net.zone_id
+  type    = "A"
+  name    = "jp.ss.tmpsc.net"
+  records = [var.ss_jp_ipaddress]
+  ttl     = 60
+}
