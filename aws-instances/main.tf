@@ -124,3 +124,16 @@ module "shadowsock_hk" {
   user_data = local.init_script_content
   s3_bucket_arn = aws_s3_bucket.vpn_configs.arn
 }
+
+module "shadowsock_us2" {
+  source = "./modules/tailscale-exit-node"
+
+  aws_region        = "us-west-1"
+  public_key_id_aws = var.public_key_id_aws
+  instance_name     = "awsus2"
+  ami_id_ubuntu     = "ami-0956795e802e30f2b"
+  availability_zone = "us-west-1b"
+
+  user_data = local.init_script_content
+  s3_bucket_arn = aws_s3_bucket.vpn_configs.arn
+}

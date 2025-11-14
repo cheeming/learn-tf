@@ -27,3 +27,8 @@ output "hk_instance_public_ip" {
   description = "Public IP address of the EC2 instance"
   value       = module.shadowsock_hk.instance_public_ip
 }
+
+output "us2_instance_public_ip" {
+  description = "Public IP address of the EC2 instance"
+  value       = module.shadowsock_us2.instance_public_ip
+}
