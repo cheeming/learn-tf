@@ -34,7 +34,7 @@ sysctl -p /etc/sysctl.conf
 # ADD CRONTAB
 
 # start shadowsocks on machine start
-(crontab -l 2>/dev/null; echo "@reboot /home/ubuntu/start-ss &") | crontab -
+(crontab -l 2>/dev/null; echo "@reboot choom -n -1000 /home/ubuntu/start-ss &") | crontab -
 
 # update Dynamic DNS
 (crontab -l 2>/dev/null; echo "@reboot /home/ubuntu/update-ddns") | crontab -
