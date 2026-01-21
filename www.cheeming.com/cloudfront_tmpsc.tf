@@ -18,7 +18,7 @@ resource "aws_cloudfront_origin_access_control" "www_tmpsc_net_cf_oac" {
 
 resource "aws_cloudfront_distribution" "www_tmpsc_net_cf" {
   origin {
-    domain_name              = aws_s3_bucket.www_cheeming_com.bucket_regional_domain_name
+    domain_name = aws_s3_bucket.www_cheeming_com.bucket_regional_domain_name
     // FIXME: due to s3 website hosting, this is not really needed
     origin_access_control_id = aws_cloudfront_origin_access_control.www_tmpsc_net_cf_oac.id
     origin_id                = local.s3_origin_id
@@ -54,8 +54,8 @@ resource "aws_cloudfront_distribution" "www_tmpsc_net_cf" {
 
   restrictions {
     geo_restriction {
-      restriction_type  = "none"
-      locations         = []
+      restriction_type = "none"
+      locations        = []
     }
   }
 
@@ -81,7 +81,7 @@ resource "aws_s3_bucket_website_configuration" "tmpsc_net_root" {
   bucket = aws_s3_bucket.tmpsc_net_root.id
 
   redirect_all_requests_to {
-    protocol = "https"
+    protocol  = "https"
     host_name = "www.tmpsc.net"
   }
 }
@@ -100,14 +100,14 @@ resource "aws_acm_certificate" "tmpsc_net_cert" {
 resource "aws_cloudfront_distribution" "tmpsc_net_cf" {
 
   origin {
-    domain_name              = aws_s3_bucket_website_configuration.tmpsc_net_root.website_endpoint
-    origin_id                = local.s3_origin_id
+    domain_name = aws_s3_bucket_website_configuration.tmpsc_net_root.website_endpoint
+    origin_id   = local.s3_origin_id
 
     custom_origin_config {
-      http_port               = 80
-      https_port              = 443
-      origin_protocol_policy  = "http-only"
-      origin_ssl_protocols    = ["TLSv1.2"]
+      http_port              = 80
+      https_port             = 443
+      origin_protocol_policy = "http-only"
+      origin_ssl_protocols   = ["TLSv1.2"]
     }
   }
 
@@ -141,8 +141,8 @@ resource "aws_cloudfront_distribution" "tmpsc_net_cf" {
 
   restrictions {
     geo_restriction {
-      restriction_type  = "none"
-      locations         = []
+      restriction_type = "none"
+      locations        = []
     }
   }
 

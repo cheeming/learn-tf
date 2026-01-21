@@ -36,7 +36,7 @@ resource "aws_cloudfront_origin_access_control" "www_cheeming_com_cf_oac" {
 
 resource "aws_cloudfront_distribution" "www_cheeming_com_cf" {
   origin {
-    domain_name              = aws_s3_bucket.www_cheeming_com.bucket_regional_domain_name
+    domain_name = aws_s3_bucket.www_cheeming_com.bucket_regional_domain_name
     // FIXME: due to s3 website hosting, this is not really needed
     origin_access_control_id = aws_cloudfront_origin_access_control.www_cheeming_com_cf_oac.id
     origin_id                = local.s3_origin_id
@@ -72,8 +72,8 @@ resource "aws_cloudfront_distribution" "www_cheeming_com_cf" {
 
   restrictions {
     geo_restriction {
-      restriction_type  = "none"
-      locations         = []
+      restriction_type = "none"
+      locations        = []
     }
   }
 
@@ -100,7 +100,7 @@ resource "aws_s3_bucket_website_configuration" "nextjs_cheeming_com" {
 }
 
 resource "aws_s3_bucket_public_access_block" "nextjs_cheeming_com" {
-  bucket = aws_s3_bucket.nextjs_cheeming_com.id
+  bucket            = aws_s3_bucket.nextjs_cheeming_com.id
   block_public_acls = false
 }
 
@@ -137,14 +137,14 @@ resource "aws_acm_certificate" "nextjs_cheeming_com_cert" {
 // 2025-06-03: CNAME record with value aws_cloudfront_distribution.nextjs_cheeming_com_cf.domain_name 
 resource "aws_cloudfront_distribution" "nextjs_cheeming_com_cf" {
   origin {
-    domain_name              = aws_s3_bucket_website_configuration.nextjs_cheeming_com.website_endpoint
-    origin_id                = local.s3_origin_id
+    domain_name = aws_s3_bucket_website_configuration.nextjs_cheeming_com.website_endpoint
+    origin_id   = local.s3_origin_id
 
     custom_origin_config {
-      http_port               = 80
-      https_port              = 443
-      origin_protocol_policy  = "http-only"
-      origin_ssl_protocols    = ["TLSv1.2"]
+      http_port              = 80
+      https_port             = 443
+      origin_protocol_policy = "http-only"
+      origin_ssl_protocols   = ["TLSv1.2"]
     }
   }
 
@@ -178,8 +178,8 @@ resource "aws_cloudfront_distribution" "nextjs_cheeming_com_cf" {
 
   restrictions {
     geo_restriction {
-      restriction_type  = "none"
-      locations         = []
+      restriction_type = "none"
+      locations        = []
     }
   }
 
