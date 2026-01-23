@@ -1,0 +1,40 @@
+variable "public_key_id_aws" {
+  description = "The public key for the key pair used to SSH into the server"
+  type        = string
+  sensitive   = true
+}
+
+variable "ss_password" {
+  description = "The password for the Shadowsocks server"
+  type        = string
+  sensitive   = true
+}
+
+variable "ss_domain_name" {
+  description = "The domain name used for TLS"
+  type        = string
+  default     = "tmpsc.net"
+}
+
+variable "ss_cert_file" {
+  description = "The certificate file for the domain name"
+  type        = string
+  default     = "/home/ubuntu/tmpsc.net/tmpsc_net.cer"
+}
+
+variable "ss_key_file" {
+  description = "The key file for the domain name"
+  type        = string
+  default     = "/home/ubuntu/tmpsc.net/tmpsc_net.key"
+}
+
+variable "noip_username" {
+  description = "The username for No-IP"
+  type        = string
+}
+
+variable "noip_password" {
+  description = "The password for No-IP"
+  type        = string
+  sensitive   = true
+}
