@@ -137,3 +137,15 @@ module "shadowsock_us2" {
   user_data     = local.init_script_content
   s3_bucket_arn = aws_s3_bucket.vpn_configs.arn
 }
+
+module "shadowsock_aus" {
+  source = "./modules/tailscale-exit-node"
+
+  aws_region        = "ap-southeast-2"
+  public_key_id_aws = var.public_key_id_aws
+  instance_name     = "awsaus"
+  ami_id_ubuntu     = "ami-0f05d48c0353e144c"
+
+  user_data     = local.init_script_content
+  s3_bucket_arn = aws_s3_bucket.vpn_configs.arn
+}

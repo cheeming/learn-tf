@@ -6,6 +6,7 @@ locals {
     hk    = var.ss_hk_ipaddress
     us    = var.ss_us_ipaddress
     us2   = var.ss_us2_ipaddress
+    aus   = var.ss_aus_ipaddress
   }
 }
 
@@ -153,5 +154,15 @@ resource "aws_route53_record" "tmpsc_ss_us2" {
   type    = "A"
   name    = "us2.ss.tmpsc.net"
   records = [local.ss_ip_records.us2]
+  ttl     = 60
+}
+
+resource "aws_route53_record" "tmpsc_ss_aus" {
+  count = local.ss_ip_records.aus == null ? 0 : 1
+
+  zone_id = aws_route53_zone.tmpsc_net.zone_id
+  type    = "A"
+  name    = "aus.ss.tmpsc.net"
+  records = [local.ss_ip_records.aus]
   ttl     = 60
 }

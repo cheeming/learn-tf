@@ -33,3 +33,9 @@ variable "ss_us2_ipaddress" {
   type        = string
   default     = null
 }
+
+variable "ss_aus_ipaddress" {
+  description = "Public IP address for aus.ss.tmpsc.net"
+  type        = string
+  default     = null
+}
