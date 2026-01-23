@@ -4,8 +4,7 @@
 .terraform.*
 *.tfstate
 *.tfstate.*backup
-
-variables.tf
+tf.plan
 
 node_modules/
 

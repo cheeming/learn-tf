@@ -18,7 +18,7 @@ _ss_tf_base:
     TF_STATE_NAME: aws-instances
     TF_BACKEND_USERNAME: gitlab-ci-token
   before_script:
-    - cd aws-instances
+    - cd ${TF_STATE_NAME}
     - cp variables.tf.EXAMPLE variables.tf
     - terraform init -backend-config="address=https://gitlab.com/api/v4/projects/71332047/terraform/state/${TF_STATE_NAME}" -backend-config="lock_address=https://gitlab.com/api/v4/projects/71332047/terraform/state/${TF_STATE_NAME}/lock" -backend-config="unlock_address=https://gitlab.com/api/v4/projects/71332047/terraform/state/${TF_STATE_NAME}/lock" -backend-config="username=${TF_BACKEND_USERNAME}" -backend-config="password=${CI_JOB_TOKEN}" -backend-config="lock_method=POST" -backend-config="unlock_method=DELETE" -backend-config="retry_wait_min=5"
   script:
@@ -26,15 +26,43 @@ _ss_tf_base:
   rules:
     - when: never
 
+_ss_dns_base:
+  extends: _ss_tf_base
+  variables:
+    TF_STATE_NAME: www.cheeming.com
+
 ss_tf_apply:
   extends: _ss_tf_base
   script:
     - terraform apply -auto-approve -target=module.shadowsock_$[[ inputs.ss_location ]].aws_instance.ec2_server
+    - |
+      OUTPUT_NAME="$[[ inputs.ss_location ]]_instance_public_ip"
+      IP_ADDRESS="$(terraform output -raw "$OUTPUT_NAME")"
+      ENV_VAR="TF_VAR_ss_$[[ inputs.ss_location ]]_ipaddress"
+      printf '%s=%s\n' "$ENV_VAR" "$IP_ADDRESS" > ss_ip.env
+  artifacts:
+    reports:
+      dotenv: ss_ip.env
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule" && "$[[ inputs.schedule_job ]]" == 'ss_tf_apply'
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: never
     - when: manual
+
+ss_dns_apply:
+  extends: _ss_dns_base
+  needs:
+    - job: ss_tf_apply
+      artifacts: true
+  script:
+    - |
+      TARGET_RESOURCE="aws_route53_record.tmpsc_ss_$[[ inputs.ss_location ]]"
+      terraform apply -auto-approve -target="$TARGET_RESOURCE"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule" && "$[[ inputs.schedule_job ]]" == 'ss_tf_apply'
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
+    - when: on_success
 
 ss_tf_destroy:
   extends: _ss_tf_base

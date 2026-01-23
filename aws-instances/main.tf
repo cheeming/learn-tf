@@ -1,5 +1,5 @@
 provider "aws" {
-  region  = "us-east-1"
+  region = "us-east-1"
 }
 
 # S3 bucket to hosts scripts, binaries and etc
@@ -27,9 +27,9 @@ resource "aws_s3_object" "shadowsock_files" {
   for_each = toset(local.ss_files_s3)
 
   bucket = aws_s3_bucket.vpn_configs.id
-  key = each.key
+  key    = each.key
   source = "files/${each.key}"
-  etag = filemd5("files/${each.key}")
+  etag   = filemd5("files/${each.key}")
 }
 
 locals {
@@ -46,23 +46,23 @@ locals {
   })
 
   noip_env_content = templatefile("files/noip-duc.env.tftpl", {
-    USERNAME    = var.noip_username
-    PASSWORD    = var.noip_password
+    USERNAME = var.noip_username
+    PASSWORD = var.noip_password
   })
 }
 
 resource "aws_s3_object" "ss_start_script" {
-  bucket = aws_s3_bucket.vpn_configs.id
-  key = "start-ss"
+  bucket  = aws_s3_bucket.vpn_configs.id
+  key     = "start-ss"
   content = local.ss_start_script_content
-  etag = md5(local.ss_start_script_content)
+  etag    = md5(local.ss_start_script_content)
 }
 
 resource "aws_s3_object" "noip_env" {
-  bucket = aws_s3_bucket.vpn_configs.id
-  key = "noip-duc.env"
+  bucket  = aws_s3_bucket.vpn_configs.id
+  key     = "noip-duc.env"
   content = local.noip_env_content
-  etag = md5(local.noip_env_content)
+  etag    = md5(local.noip_env_content)
 }
 
 module "shadowsock_tokyo" {
@@ -73,7 +73,7 @@ module "shadowsock_tokyo" {
   instance_name     = "awstokyo1"
   ami_id_ubuntu     = "ami-0cef62348b8426830"
 
-  user_data = local.init_script_content
+  user_data     = local.init_script_content
   s3_bucket_arn = aws_s3_bucket.vpn_configs.arn
 }
 
@@ -85,7 +85,7 @@ module "shadowsock_sg" {
   instance_name     = "awssg1"
   ami_id_ubuntu     = "ami-078f840c20e30f90d"
 
-  user_data = local.init_script_content
+  user_data     = local.init_script_content
   s3_bucket_arn = aws_s3_bucket.vpn_configs.arn
 }
 
@@ -97,7 +97,7 @@ module "shadowsock_us" {
   instance_name     = "awsus1"
   ami_id_ubuntu     = "ami-026fccd88446aa0bf"
 
-  user_data = local.init_script_content
+  user_data     = local.init_script_content
   s3_bucket_arn = aws_s3_bucket.vpn_configs.arn
 }
 
@@ -109,7 +109,7 @@ module "shadowsock_kr" {
   instance_name     = "awskr1"
   ami_id_ubuntu     = "ami-066f9893a857529ea"
 
-  user_data = local.init_script_content
+  user_data     = local.init_script_content
   s3_bucket_arn = aws_s3_bucket.vpn_configs.arn
 }
 
@@ -121,7 +121,7 @@ module "shadowsock_hk" {
   instance_name     = "awshk1"
   ami_id_ubuntu     = "ami-0532ac7628bfaf6c7"
 
-  user_data = local.init_script_content
+  user_data     = local.init_script_content
   s3_bucket_arn = aws_s3_bucket.vpn_configs.arn
 }
 
@@ -134,6 +134,6 @@ module "shadowsock_us2" {
   ami_id_ubuntu     = "ami-0956795e802e30f2b"
   availability_zone = "us-west-1b"
 
-  user_data = local.init_script_content
+  user_data     = local.init_script_content
   s3_bucket_arn = aws_s3_bucket.vpn_configs.arn
 }

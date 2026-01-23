@@ -1,5 +1,5 @@
 provider "aws" {
-  region  = var.aws_region
+  region = var.aws_region
 }
 
 # networking
@@ -13,8 +13,8 @@ resource "aws_vpc" "vpc_tailscale" {
 }
 
 resource "aws_subnet" "subnet_tailscale" {
-  vpc_id     = aws_vpc.vpc_tailscale.id
-  cidr_block = "10.0.0.0/24"
+  vpc_id            = aws_vpc.vpc_tailscale.id
+  cidr_block        = "10.0.0.0/24"
   availability_zone = var.availability_zone
 
   tags = {
@@ -107,13 +107,13 @@ resource "aws_key_pair" "id_aws" {
 # servers
 
 resource "aws_instance" "ec2_server" {
-  ami           = var.ami_id_ubuntu  // ubuntu 24.04 LTS arm64 in HK
-  instance_type = "t4g.nano"
+  ami                         = var.ami_id_ubuntu // ubuntu 24.04 LTS arm64 in HK
+  instance_type               = "t4g.nano"
   associate_public_ip_address = true
-  key_name = aws_key_pair.id_aws.id
-  vpc_security_group_ids = [aws_security_group.sg_ssh_proxy_vpn.id]
-  subnet_id = aws_subnet.subnet_tailscale.id
-  user_data = var.user_data
+  key_name                    = aws_key_pair.id_aws.id
+  vpc_security_group_ids      = [aws_security_group.sg_ssh_proxy_vpn.id]
+  subnet_id                   = aws_subnet.subnet_tailscale.id
+  user_data                   = var.user_data
 
   iam_instance_profile = aws_iam_instance_profile.ec2_server.name
 
@@ -144,7 +144,7 @@ EOF
 
 resource "aws_iam_role" "ec2_server" {
   permissions_boundary = aws_iam_policy.ec2_permission_boundary.arn
-  assume_role_policy = <<EOF
+  assume_role_policy   = <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [
