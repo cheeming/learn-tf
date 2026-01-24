@@ -41,7 +41,7 @@ ss_tf_apply:
       printf '%s=%s\n' "$ENV_VAR" "$IP_ADDRESS" > ss_ip.env
   artifacts:
     reports:
-      dotenv: ss_ip.env
+      dotenv: ${TF_STATE_NAME}/ss_ip.env
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule" && "$[[ inputs.schedule_job ]]" == 'ss_tf_apply'
     - if: $CI_PIPELINE_SOURCE == "schedule"
