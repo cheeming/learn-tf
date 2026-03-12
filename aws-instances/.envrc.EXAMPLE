@@ -1,0 +1,5 @@
+export AWS_PROFILE=YOUR_PROFILE
+export TF_VAR_noip_username=USERNAME
+export TF_VAR_noip_password=PASSWORD
+export TF_VAR_ss_password=SS_PASSWORD
+export TF_VAR_public_key_id_aws="PUBLIC_KEY"
