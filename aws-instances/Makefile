@@ -9,3 +9,6 @@ plan:
 apply:
 	terraform apply tfplan && rm tfplan
 
+update_s3:
+	TARGET=aws_s3_object.shadowsock_files $(MAKE) plan
+	$(MAKE) apply
