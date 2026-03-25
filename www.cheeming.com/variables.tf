@@ -39,3 +39,22 @@ variable "ss_aus_ipaddress" {
   type        = string
   default     = null
 }
+
+variable "ss_active_location" {
+  description = "Active Shadowsocks location for ss.tmpsc.net CNAME"
+  type        = string
+  default     = null
+
+  validation {
+    condition = var.ss_active_location == null || contains([
+      "tokyo",
+      "sg",
+      "kr",
+      "hk",
+      "us",
+      "us2",
+      "aus",
+    ], var.ss_active_location)
+    error_message = "ss_active_location must be one of: tokyo, sg, kr, hk, us, us2, aus."
+  }
+}

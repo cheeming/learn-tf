@@ -97,6 +97,16 @@ resource "aws_route53_record" "tmpsc_dkim" {
   ttl     = 60
 }
 
+resource "aws_route53_record" "tmpsc_ss_active" {
+  count = var.ss_active_location == null ? 0 : 1
+
+  zone_id = aws_route53_zone.tmpsc_net.zone_id
+  type    = "CNAME"
+  name    = "ss.tmpsc.net"
+  records = ["${var.ss_active_location}.ss.tmpsc.net"]
+  ttl     = 60
+}
+
 resource "aws_route53_record" "tmpsc_ss_tokyo" {
   count = local.ss_ip_records.tokyo == null ? 0 : 1
 

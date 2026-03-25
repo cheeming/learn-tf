@@ -56,7 +56,8 @@ ss_dns_apply:
   script:
     - |
       TARGET_RESOURCE="aws_route53_record.tmpsc_ss_$[[ inputs.ss_location ]]"
-      terraform apply -auto-approve -target="$TARGET_RESOURCE"
+      export TF_VAR_ss_active_location="$[[ inputs.ss_location ]]"
+      terraform apply -auto-approve -target="$TARGET_RESOURCE" -target="aws_route53_record.tmpsc_ss_active"
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule" && "$[[ inputs.schedule_job ]]" == 'ss_tf_apply'
     - if: $CI_PIPELINE_SOURCE == "schedule"
