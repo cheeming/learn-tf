@@ -77,22 +77,6 @@ resource "aws_vpc_security_group_ingress_rule" "allow_in_ipv4_https" {
   to_port           = 443
 }
 
-resource "aws_vpc_security_group_ingress_rule" "allow_in_ipv4_only_shadowsocks_tcp" {
-  security_group_id = aws_security_group.sg_ssh_proxy_vpn.id
-  cidr_ipv4         = "0.0.0.0/0"
-  from_port         = 8488
-  ip_protocol       = "tcp"
-  to_port           = 8488
-}
-
-resource "aws_vpc_security_group_ingress_rule" "allow_in_ipv4_only_shadowsocks_udp" {
-  security_group_id = aws_security_group.sg_ssh_proxy_vpn.id
-  cidr_ipv4         = "0.0.0.0/0"
-  from_port         = 8488
-  ip_protocol       = "udp"
-  to_port           = 8488
-}
-
 resource "aws_vpc_security_group_egress_rule" "allow_eg_ipv4_all" {
   security_group_id = aws_security_group.sg_ssh_proxy_vpn.id
   cidr_ipv4         = "0.0.0.0/0"
