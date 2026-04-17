@@ -34,6 +34,30 @@ resource "aws_cloudfront_origin_access_control" "www_cheeming_com_cf_oac" {
   signing_protocol                  = "sigv4"
 }
 
+resource "aws_cloudfront_function" "www_cheeming_com_nice_redirect" {
+  name    = "www_cheeming_com_nice_redirect"
+  runtime = "cloudfront-js-1.0"
+  comment = "Redirect /nice and /nice/ to /nice/index.html"
+  publish = true
+  code    = <<-EOT
+    function handler(event) {
+      var request = event.request;
+
+      if (request.uri === '/nice' || request.uri === '/nice/') {
+        return {
+          statusCode: 301,
+          statusDescription: 'Moved Permanently',
+          headers: {
+            location: { value: 'https://www.cheeming.com/nice/index.html' }
+          }
+        };
+      }
+
+      return request;
+    }
+  EOT
+}
+
 resource "aws_cloudfront_distribution" "www_cheeming_com_cf" {
   origin {
     domain_name = aws_s3_bucket.www_cheeming_com.bucket_regional_domain_name
@@ -53,6 +77,11 @@ resource "aws_cloudfront_distribution" "www_cheeming_com_cf" {
     allowed_methods  = ["GET", "HEAD", "OPTIONS"]
     cached_methods   = ["GET", "HEAD"]
     target_origin_id = local.s3_origin_id
+
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.www_cheeming_com_nice_redirect.arn
+    }
 
     forwarded_values {
       query_string = false

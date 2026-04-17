@@ -114,7 +114,7 @@ resource "aws_cloudfront_distribution" "tmpsc_net_cf" {
   enabled             = true
   is_ipv6_enabled     = true
   comment             = "To host tmpsc.net"
-  default_root_object = "index.html"
+  default_root_object = "tmpsc/index.html"
 
   aliases = ["tmpsc.net"]
 
