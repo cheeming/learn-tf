@@ -39,6 +39,7 @@ ss_tf_apply:
       IP_ADDRESS="$(terraform output -raw "$OUTPUT_NAME")"
       ENV_VAR="TF_VAR_ss_$[[ inputs.ss_location ]]_ipaddress"
       printf '%s=%s\n' "$ENV_VAR" "$IP_ADDRESS" > ss_ip.env
+      printf '%s=%s\n' "SS_IP_ADDRESS" "$IP_ADDRESS" >> ss_ip.env
   artifacts:
     reports:
       dotenv: ${TF_STATE_NAME}/ss_ip.env
@@ -48,10 +49,28 @@ ss_tf_apply:
       when: never
     - when: manual
 
+ss_connectivity_check:
+  stage: deploy
+  image:
+    name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/alpine:3.20
+    entrypoint: [""]
+  needs:
+    - job: ss_tf_apply
+      artifacts: true
+  script:
+    - apk add --no-cache netcat-openbsd
+    - cd aws-instances
+    - ./scripts/test_connect_ss.sh "$SS_IP_ADDRESS"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule" && "$[[ inputs.schedule_job ]]" == 'ss_tf_apply'
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
+    - when: on_success
+
 ss_dns_apply:
   extends: _ss_dns_base
   needs:
-    - job: ss_tf_apply
+    - job: ss_connectivity_check
       artifacts: true
   script:
     - |
