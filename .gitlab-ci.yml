@@ -71,6 +71,8 @@ ss_connectivity_check:
 ss_dns_apply:
   extends: _ss_dns_base
   needs:
+    - job: ss_tf_apply
+      artifacts:  true
     - job: ss_connectivity_check
       artifacts: true
   script:
