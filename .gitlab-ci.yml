@@ -61,12 +61,13 @@ ss_connectivity_check:
     - apk add --no-cache netcat-openbsd
     - cd aws-instances
     - ./scripts/test_connect_ss.sh "$SS_IP_ADDRESS"
+  retry: 2
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule" && "$[[ inputs.schedule_job ]]" == 'ss_tf_apply'
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: never
     - when: delayed
-      start_in: 90 seconds
+      start_in: 60 seconds
 
 ss_dns_apply:
   extends: _ss_dns_base
