@@ -7,6 +7,10 @@ spec:
       type: string
       default: 'tokyo'
 ---
+stages:
+  - deploy
+  - test
+
 _ss_tf_base:
   stage: deploy
   environment: ss_production
@@ -50,7 +54,7 @@ ss_tf_apply:
     - when: manual
 
 ss_connectivity_check:
-  stage: deploy
+  stage: test
   image:
     name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/alpine:3.20
     entrypoint: [""]
@@ -58,7 +62,7 @@ ss_connectivity_check:
     - job: ss_tf_apply
       artifacts: true
   script:
-    - apk add --no-cache netcat-openbsd
+    - sleep 15
     - cd aws-instances
     - ./scripts/test_connect_ss.sh "$SS_IP_ADDRESS"
   retry: 2
@@ -74,8 +78,6 @@ ss_dns_apply:
   needs:
     - job: ss_tf_apply
       artifacts:  true
-    - job: ss_connectivity_check
-      artifacts: true
   script:
     - |
       TARGET_RESOURCE="aws_route53_record.tmpsc_ss_$[[ inputs.ss_location ]]"
