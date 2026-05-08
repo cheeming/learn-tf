@@ -69,7 +69,7 @@ ss_connectivity_check:
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule" && "$[[ inputs.schedule_job ]]" == 'ss_tf_apply'
       when: delayed
-      start_in: 200 seconds
+      start_in: 90 seconds
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: never
     - when: manual
