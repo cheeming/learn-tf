@@ -68,7 +68,7 @@ ss_connectivity_check:
   retry: 2
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule" && "$[[ inputs.schedule_job ]]" == 'ss_tf_apply'
-    - when: delayed
+      when: delayed
       start_in: 200 seconds
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: never
