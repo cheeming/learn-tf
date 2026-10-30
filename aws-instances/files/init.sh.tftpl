@@ -8,6 +8,15 @@ echo "init.sh --- START"
 
 export DEBIAN_FRONTEND=noninteractive
 
+# REMOVE SSH (Ubuntu 24.04 can use socket activation)
+for UNIT in ssh.socket ssh.service; do
+    if systemctl cat "$UNIT" >/dev/null 2>&1; then
+        systemctl disable --now "$UNIT"
+    fi
+done
+apt-get purge -y openssh-server
+systemctl mask ssh.service ssh.socket
+
 # INSTALL DEPENDENCIES
 apt-get update
 apt remove -y unattended-upgrades

@@ -53,20 +53,12 @@ resource "aws_route_table_association" "rta_subnet_tailscale" {
 
 resource "aws_security_group" "sg_ssh_proxy_vpn" {
   name        = "sg_ssh_proxy_vpn"
-  description = "Allow SSH and Proxy/VPN related ports inbound traffic and all outbound traffic"
+  description = "Allow TCP 443 inbound traffic and all outbound traffic"
   vpc_id      = aws_vpc.vpc_tailscale.id
 
   tags = {
     Name = "sg_ssh_proxy_vpn"
   }
-}
-
-resource "aws_vpc_security_group_ingress_rule" "allow_in_ipv4_only_ssh" {
-  security_group_id = aws_security_group.sg_ssh_proxy_vpn.id
-  cidr_ipv4         = "0.0.0.0/0"
-  from_port         = 22
-  ip_protocol       = "tcp"
-  to_port           = 22
 }
 
 resource "aws_vpc_security_group_ingress_rule" "allow_in_ipv4_https" {
@@ -83,18 +75,12 @@ resource "aws_vpc_security_group_egress_rule" "allow_eg_ipv4_all" {
   ip_protocol       = "-1" # semantically equivalent to all ports
 }
 
-resource "aws_key_pair" "id_aws" {
-  key_name   = "id_aws"
-  public_key = var.public_key_id_aws
-}
-
 # servers
 
 resource "aws_instance" "ec2_server" {
   ami                         = var.ami_id_ubuntu // ubuntu 24.04 LTS arm64 in HK
   instance_type               = "t4g.nano"
   associate_public_ip_address = true
-  key_name                    = aws_key_pair.id_aws.id
   vpc_security_group_ids      = [aws_security_group.sg_ssh_proxy_vpn.id]
   subnet_id                   = aws_subnet.subnet_tailscale.id
   user_data                   = var.user_data

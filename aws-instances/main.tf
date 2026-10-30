@@ -68,10 +68,9 @@ resource "aws_s3_object" "noip_env" {
 module "shadowsock_tokyo" {
   source = "./modules/tailscale-exit-node"
 
-  aws_region        = "ap-northeast-1"
-  public_key_id_aws = var.public_key_id_aws
-  instance_name     = "awstokyo1"
-  ami_id_ubuntu     = "ami-0cef62348b8426830"
+  aws_region    = "ap-northeast-1"
+  instance_name = "awstokyo1"
+  ami_id_ubuntu = "ami-0cef62348b8426830"
 
   user_data     = local.init_script_content
   s3_bucket_arn = aws_s3_bucket.vpn_configs.arn
@@ -80,10 +79,9 @@ module "shadowsock_tokyo" {
 module "shadowsock_sg" {
   source = "./modules/tailscale-exit-node"
 
-  aws_region        = "ap-southeast-1"
-  public_key_id_aws = var.public_key_id_aws
-  instance_name     = "awssg1"
-  ami_id_ubuntu     = "ami-078f840c20e30f90d"
+  aws_region    = "ap-southeast-1"
+  instance_name = "awssg1"
+  ami_id_ubuntu = "ami-078f840c20e30f90d"
 
   user_data     = local.init_script_content
   s3_bucket_arn = aws_s3_bucket.vpn_configs.arn
@@ -92,10 +90,9 @@ module "shadowsock_sg" {
 module "shadowsock_us" {
   source = "./modules/tailscale-exit-node"
 
-  aws_region        = "us-east-1"
-  public_key_id_aws = var.public_key_id_aws
-  instance_name     = "awsus1"
-  ami_id_ubuntu     = "ami-026fccd88446aa0bf"
+  aws_region    = "us-east-1"
+  instance_name = "awsus1"
+  ami_id_ubuntu = "ami-026fccd88446aa0bf"
 
   user_data     = local.init_script_content
   s3_bucket_arn = aws_s3_bucket.vpn_configs.arn
@@ -104,10 +101,9 @@ module "shadowsock_us" {
 module "shadowsock_kr" {
   source = "./modules/tailscale-exit-node"
 
-  aws_region        = "ap-northeast-2"
-  public_key_id_aws = var.public_key_id_aws
-  instance_name     = "awskr1"
-  ami_id_ubuntu     = "ami-066f9893a857529ea"
+  aws_region    = "ap-northeast-2"
+  instance_name = "awskr1"
+  ami_id_ubuntu = "ami-066f9893a857529ea"
 
   user_data     = local.init_script_content
   s3_bucket_arn = aws_s3_bucket.vpn_configs.arn
@@ -116,10 +112,9 @@ module "shadowsock_kr" {
 module "shadowsock_hk" {
   source = "./modules/tailscale-exit-node"
 
-  aws_region        = "ap-east-1"
-  public_key_id_aws = var.public_key_id_aws
-  instance_name     = "awshk1"
-  ami_id_ubuntu     = "ami-0532ac7628bfaf6c7"
+  aws_region    = "ap-east-1"
+  instance_name = "awshk1"
+  ami_id_ubuntu = "ami-0532ac7628bfaf6c7"
 
   user_data     = local.init_script_content
   s3_bucket_arn = aws_s3_bucket.vpn_configs.arn
@@ -129,7 +124,6 @@ module "shadowsock_us2" {
   source = "./modules/tailscale-exit-node"
 
   aws_region        = "us-west-1"
-  public_key_id_aws = var.public_key_id_aws
   instance_name     = "awsus2"
   ami_id_ubuntu     = "ami-0956795e802e30f2b"
   availability_zone = "us-west-1b"
@@ -141,10 +135,9 @@ module "shadowsock_us2" {
 module "shadowsock_aus" {
   source = "./modules/tailscale-exit-node"
 
-  aws_region        = "ap-southeast-2"
-  public_key_id_aws = var.public_key_id_aws
-  instance_name     = "awsaus"
-  ami_id_ubuntu     = "ami-0f05d48c0353e144c"
+  aws_region    = "ap-southeast-2"
+  instance_name = "awsaus"
+  ami_id_ubuntu = "ami-0f05d48c0353e144c"
 
   user_data     = local.init_script_content
   s3_bucket_arn = aws_s3_bucket.vpn_configs.arn

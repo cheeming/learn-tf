@@ -3,12 +3,6 @@ variable "aws_region" {
   type        = string
 }
 
-variable "public_key_id_aws" {
-  description = "The public key for the key pair used to SSH into the server"
-  type        = string
-  sensitive   = true
-}
-
 variable "instance_name" {
   description = "The server instance name"
   type        = string

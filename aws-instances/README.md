@@ -6,6 +6,22 @@ Pre-requisite
 -------------
  - terraform v1.10.2
 
+Server access and connectivity
+------------------------------
+Bootstrap purges the SSH server and masks both its service and socket. Instances
+have no EC2 SSH key pair or SSH ingress rule, and the SSM agent is removed to
+reduce memory usage. TCP 443 is the only permitted inbound port.
+
+The GitLab connectivity check verifies that TCP 443 is reachable and TCP 22 is
+inaccessible. To run it manually:
+```
+./scripts/test_connect_ss.sh <hostname>
+```
+
+When deploying the SSH removal, review and apply a full Terraform plan once to
+remove existing SSH ingress rules and key-pair resources. The scheduled jobs
+target only the EC2 instance and do not reconcile those removed resources.
+
 Terraform
 ---------
 ```

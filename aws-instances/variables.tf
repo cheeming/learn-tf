@@ -1,9 +1,3 @@
-variable "public_key_id_aws" {
-  description = "The public key for the key pair used to SSH into the server"
-  type        = string
-  sensitive   = true
-}
-
 variable "ss_password" {
   description = "The password for the Shadowsocks server"
   type        = string
