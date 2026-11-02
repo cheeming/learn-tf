@@ -62,14 +62,14 @@ ss_connectivity_check:
     - job: ss_tf_apply
       artifacts: true
   script:
-    - sleep 20
+    - sleep 10
     - cd aws-instances
     - ./scripts/test_connect_ss.sh "$SS_IP_ADDRESS"
-  retry: 2
+  retry: 1
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule" && "$[[ inputs.schedule_job ]]" == 'ss_tf_apply'
       when: delayed
-      start_in: 240 seconds
+      start_in: 300 seconds
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: never
     - when: manual
