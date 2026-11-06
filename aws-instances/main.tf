@@ -125,7 +125,7 @@ module "shadowsock_us2" {
 
   aws_region        = "us-west-1"
   instance_name     = "awsus2"
-  ami_id_ubuntu     = "ami-0956795e802e30f2b"
+  ami_id_ubuntu     = "ami-0b365c5171ee7124c"
   availability_zone = "us-west-1b"
 
   user_data     = local.init_script_content
@@ -137,7 +137,7 @@ module "shadowsock_aus" {
 
   aws_region    = "ap-southeast-2"
   instance_name = "awsaus"
-  ami_id_ubuntu = "ami-0f05d48c0353e144c"
+  ami_id_ubuntu = "ami-083f2721b2de7039e"
 
   user_data     = local.init_script_content
   s3_bucket_arn = aws_s3_bucket.vpn_configs.arn
