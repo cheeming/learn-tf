@@ -6,6 +6,9 @@ plan:
 	terraform plan -out=tfplan -target=${TARGET}
 	tf-summarize tfplan
 
+check-diff:
+	terraform plan -out=tfplan.tmp -lock=false && tf-summarize tfplan.tmp && rm tfplan.tmp
+
 apply:
 	terraform apply tfplan && rm tfplan
 
