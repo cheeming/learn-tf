@@ -70,7 +70,7 @@ module "shadowsock_tokyo" {
 
   aws_region    = "ap-northeast-1"
   instance_name = "awstokyo1"
-  ami_id_ubuntu = "ami-0cef62348b8426830"
+  ami_id_ubuntu = "ami-07d7d1bf631243bb0"
 
   user_data     = local.init_script_content
   s3_bucket_arn = aws_s3_bucket.vpn_configs.arn
@@ -92,7 +92,7 @@ module "shadowsock_us" {
 
   aws_region    = "us-east-1"
   instance_name = "awsus1"
-  ami_id_ubuntu = "ami-026fccd88446aa0bf"
+  ami_id_ubuntu = "ami-09a93d801db0bafae"
 
   user_data     = local.init_script_content
   s3_bucket_arn = aws_s3_bucket.vpn_configs.arn
@@ -125,7 +125,7 @@ module "shadowsock_us2" {
 
   aws_region        = "us-west-1"
   instance_name     = "awsus2"
-  ami_id_ubuntu     = "ami-0b365c5171ee7124c"
+  ami_id_ubuntu     = "ami-02b9b3bdf3f150286"
   availability_zone = "us-west-1b"
 
   user_data     = local.init_script_content
@@ -137,7 +137,7 @@ module "shadowsock_aus" {
 
   aws_region    = "ap-southeast-2"
   instance_name = "awsaus"
-  ami_id_ubuntu = "ami-083f2721b2de7039e"
+  ami_id_ubuntu = "ami-0b58dc56768a169ca"
 
   user_data     = local.init_script_content
   s3_bucket_arn = aws_s3_bucket.vpn_configs.arn

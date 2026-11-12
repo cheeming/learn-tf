@@ -9,6 +9,10 @@ plan:
 apply:
 	terraform apply tfplan && rm tfplan
 
+destroy:
+	terraform plan -destroy -out=tfplan -target=${TARGET}
+	tf-summarize tfplan
+
 update_s3:
 	TARGET=aws_s3_object.shadowsock_files $(MAKE) plan
 	$(MAKE) apply

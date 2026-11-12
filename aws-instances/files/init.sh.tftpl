@@ -21,7 +21,9 @@ systemctl mask ssh.service ssh.socket
 apt-get update
 apt remove -y unattended-upgrades
 apt install -y --no-install-recommends unzip
-apt upgrade -y --no-install-recommends
+
+# DO NOT UPGRADE FOR NOW, TAKES TOO LONG
+#apt upgrade -y --no-install-recommends
 
 # COMMENTED: Not stable
 #snap install aws-cli --classic
@@ -29,6 +31,7 @@ curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zi
 unzip awscliv2.zip
 ./aws/install
 
+# keep ssm for now, to debug
 snap remove amazon-ssm-agent
 
 # COPY FILES FROM S3

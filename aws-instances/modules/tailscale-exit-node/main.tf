@@ -106,6 +106,11 @@ resource "aws_iam_policy" "ec2_permission_boundary" {
         "${var.s3_bucket_arn}",
         "${var.s3_bucket_arn}/*"
       ]
+    },
+    {
+      "Effect":"Allow",
+      "Action":["ssm:*","ssmmessages:*","ec2messages:*"],
+      "Resource":"*"
     }
   ]
 }
@@ -131,6 +136,11 @@ EOF
 resource "aws_iam_role_policy_attachment" "ec2_server_s3_policy" {
   role       = aws_iam_role.ec2_server.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "ec2_server_ssm_policy" {
+  role       = aws_iam_role.ec2_server.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 resource "aws_iam_instance_profile" "ec2_server" {
