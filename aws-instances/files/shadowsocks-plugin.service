@@ -1,0 +1,30 @@
+[Unit]
+Description=Standalone Shadowsocks TLS WebSocket transport
+Requires=shadowsocks-firewall.service shadowsocks-backend.service
+After=network-online.target shadowsocks-firewall.service shadowsocks-backend.service
+Wants=network-online.target
+
+[Service]
+User=ss-plugin
+Group=ss-plugin
+EnvironmentFile=/etc/shadowsocks/plugin.env
+UnsetEnvironment=SS_REMOTE_HOST SS_REMOTE_PORT SS_LOCAL_HOST SS_LOCAL_PORT SS_PLUGIN_OPTIONS
+ExecStart=/usr/local/libexec/v2ray-plugin -server -tls -mode websocket -localAddr 0.0.0.0 -localPort 443 -remoteAddr 127.0.0.1 -remotePort 8388 -host ${SS_DOMAIN_NAME} -path /ws -cert ${SS_CERT_FILE} -key ${SS_KEY_FILE}
+Restart=on-failure
+RestartSec=3
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

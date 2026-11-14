@@ -22,6 +22,85 @@ When deploying the SSH removal, review and apply a full Terraform plan once to
 remove existing SSH ingress rules and key-pair resources. The scheduled jobs
 target only the EC2 instance and do not reconcile those removed resources.
 
+Internet-only Shadowsocks isolation
+-----------------------------------
+Bootstrap installs three systemd units:
+
+- `shadowsocks-firewall`: atomically loads a dedicated nftables table before
+  either proxy service starts. Stopping this unit deliberately keeps the rules.
+- `shadowsocks-backend`: runs as `ss-backend`, listening on `127.0.0.1:8388`.
+- `shadowsocks-plugin`: runs standalone as `ss-plugin`, listening on TCP 443 with
+  TLS/WebSocket path `/ws`, forwarding to the backend. Only this service receives
+  `CAP_NET_BIND_SERVICE`. No Shadowsocks `-plugin` option is used.
+
+The plugin may reply to clients and connect to the backend only. The backend may
+reply to the plugin, query Ubuntu's `127.0.0.53:53` resolver, and connect to public
+Internet addresses. Private, local, link-local, CGNAT/Tailscale, multicast,
+reserved, and documentation ranges are denied. IPv6 permits only `2000::/3`, with
+additional conservative exclusions for protocol assignments, documentation and
+6to4; NAT64 and other transition ranges outside this allocation are denied.
+IPv4-mapped destinations use the IPv4 routing/filter path. Rules apply to the
+actual destination IP, including destinations obtained through DNS.
+
+The local DNS exception can also be reached by authenticated proxy users on port
+53; it does not allow arbitrary access to other private services. The address
+policy is conservative (some globally reachable special-purpose addresses are
+also denied), static, and should be reviewed when IANA allocations change.
+Only these two accounts are restricted; root bootstrap retains metadata access
+for S3 downloads. IMDSv2 is explicitly required but is not the egress control.
+Other host firewall tables are preserved; do not flush the global ruleset while
+these services run. Rules use connection-tracking reply direction, not a blanket
+established-connection exception.
+
+Binaries are installed root-owned under `/usr/local/libexec`. The password is in
+root-only `/etc/shadowsocks/backend.env` and is passed by systemd, not on the
+command line. The plugin reads its certificate and key under
+`/etc/shadowsocks/tls/` (root-owned, plugin-group-readable). `ss_cert_file` and
+`ss_key_file` now specify installation paths directly in that directory; remove
+old `/home/ubuntu/...` overrides. The source certificate objects remain
+`tmpsc.net/tmpsc_net.cer` and `tmpsc.net/tmpsc_net.key` in S3. Passwords must be
+nonempty with no line breaks. Environment files are not shell scripts; do not
+source them. Secrets remain in Terraform state and restricted S3 objects.
+
+Logs go to the system journal; inspect with
+`journalctl -u shadowsocks-backend -u shadowsocks-plugin`.
+The legacy root cron launcher and its OOM-kill exemption are removed.
+Bootstrap requires systemd-resolved's stub resolver and fails if the expected
+resolver is absent. For another image, deliberately adjust both the DNS exception
+and bootstrap check. Service startup fails if firewall installation fails.
+
+Offline checks (no AWS requests or deployment):
+
+```sh
+terraform fmt -check -recursive
+terraform validate
+python3 -B -m unittest discover -s scripts/tests -p test_proxy_templates.py -v
+```
+
+Linux acceptance checks, to be run separately on a bootstrapped test host:
+
+```sh
+sudo python3 scripts/check_proxy_isolation.py
+```
+
+This checks active services, nftables validity, per-account rejection counters,
+backend DNS and public HTTPS. It only attempts socket connections to metadata;
+it never requests metadata or credentials. It does not change the firewall.
+Also test full client TLS/WebSocket/SOCKS traffic and repeat after reboot. The
+macOS transport test does not validate Linux firewall or systemd behavior.
+
+Future deployment must be explicitly reviewed: the bootstrap references the S3
+resources so Terraform orders their updates before instance creation. S3 bucket
+and instance regions differ; allow for cross-region S3 propagation if needed.
+`user_data_replace_on_change = true` makes bootstrap changes replace instances.
+A fingerprint of binaries, units and firewall rules in user data also triggers
+replacement when those files change. Password/domain/certificate-content changes
+alone still require an explicit replacement or a controlled configuration update
+and service restart. Existing instances do not download new assets on reboot.
+Review the complete plan, including removal of the old `start-ss` S3 object and
+any instance replacements, before any future deployment. No rollout is performed
+by these local validation steps.
+
 Terraform
 ---------
 ```
