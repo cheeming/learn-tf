@@ -1,0 +1,14 @@
+[Unit]
+Description=Per-account Shadowsocks egress restrictions
+After=nftables.service
+Before=shadowsocks-backend.service shadowsocks-plugin.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/nft -f /etc/shadowsocks/egress.nft
+ExecReload=/usr/sbin/nft -f /etc/shadowsocks/egress.nft
+RemainAfterExit=true
+# Deliberately keep rules installed when stopped; never fail open on service stop.
+
+[Install]
+WantedBy=multi-user.target

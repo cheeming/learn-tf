@@ -1,0 +1,48 @@
+# Dedicated table only: do not flush rules owned by Docker, Tailscale, or the OS.
+# add + flush is an atomic, repeatable transaction (including on reload).
+add table inet shadowsocks
+flush table inet shadowsocks
+table inet shadowsocks {
+    set non_public_v4 {
+        type ipv4_addr
+        flags interval
+        elements = {
+            0.0.0.0/8, 10.0.0.0/8, 100.64.0.0/10, 127.0.0.0/8,
+            169.254.0.0/16, 172.16.0.0/12, 192.0.0.0/24,
+            192.0.2.0/24, 192.88.99.0/24, 192.168.0.0/16,
+            198.18.0.0/15, 198.51.100.0/24, 203.0.113.0/24,
+            224.0.0.0/4, 240.0.0.0/4
+        }
+    }
+    set non_public_v6 {
+        type ipv6_addr
+        flags interval
+        # Conservative exclusions within global 2000::/3: protocol assignments,
+        # documentation, 6to4. Outside 2000::/3 is denied below, including NAT64,
+        # IPv4-mapped addresses, ULA, link-local, loopback, multicast, and IMDS.
+        elements = { 2001::/23, 2001:db8::/32, 2002::/16, 3fff::/20 }
+    }
+    chain plugin {
+        ct direction reply ct state established accept
+        ip daddr 127.0.0.1 tcp dport 8388 accept
+        counter reject with icmpx type admin-prohibited
+    }
+    chain backend {
+        # Reply direction only: a broad established accept would exempt outgoing
+        # proxy connections from subsequent destination checks.
+        ct direction reply ct state established accept
+        # Ubuntu systemd-resolved stub only; no DNS exception for the whole VPC.
+        ip daddr 127.0.0.53 meta l4proto { tcp, udp } th dport 53 accept
+        fib daddr type local counter reject with icmpx type admin-prohibited
+        ip daddr @non_public_v4 counter reject with icmpx type admin-prohibited
+        ip6 daddr @non_public_v6 counter reject with icmpx type admin-prohibited
+        meta nfproto ipv4 accept
+        ip6 daddr 2000::/3 accept
+        counter reject with icmpx type admin-prohibited
+    }
+    chain output {
+        type filter hook output priority -10; policy accept;
+        meta skuid "ss-plugin" jump plugin
+        meta skuid "ss-backend" jump backend
+    }
+}

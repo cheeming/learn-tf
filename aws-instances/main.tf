@@ -19,6 +19,10 @@ locals {
     "tmpsc.net/tmpsc_net.cer",
     "tmpsc.net/tmpsc_net.key",
     "noip-duc_3.3.0_arm64.deb",
+    "shadowsocks-backend.service",
+    "shadowsocks-plugin.service",
+    "shadowsocks-firewall.service",
+    "shadowsocks-egress.nft",
   ])
 }
 
@@ -33,16 +37,28 @@ resource "aws_s3_object" "shadowsock_files" {
 }
 
 locals {
-  ss_start_script_content = templatefile("files/start-ss.tftpl", {
-    PASSWORD    = var.ss_password
+  ss_backend_env = templatefile("files/backend.env.tftpl", {
+    PASSWORD = var.ss_password
+  })
+  ss_plugin_env = templatefile("files/plugin.env.tftpl", {
     DOMAIN_NAME = var.ss_domain_name
     CERT_FILE   = var.ss_cert_file
     KEY_FILE    = var.ss_key_file
   })
 
   init_script_content = templatefile("files/init.sh.tftpl", {
-    SS_FILES    = concat(local.ss_files_s3, ["start-ss", "noip-duc.env"])
-    SS_BINARIES = concat(local.ss_binaries, ["start-ss"])
+    SS_FILES = concat([for object in aws_s3_object.shadowsock_files : object.key], [
+      aws_s3_object.ss_backend_env.key, aws_s3_object.ss_plugin_env.key, aws_s3_object.noip_env.key
+    ])
+    SS_BINARIES = local.ss_binaries
+    CERT_FILE   = var.ss_cert_file
+    KEY_FILE    = var.ss_key_file
+    # Include non-secret service assets so edits require fresh bootstrap.
+    SS_REVISION = sha256(join("", [for name in [
+      "shadowsocks2-linux-arm64", "v2ray-plugin_linux_arm64",
+      "shadowsocks-backend.service", "shadowsocks-plugin.service",
+      "shadowsocks-firewall.service", "shadowsocks-egress.nft"
+    ] : filemd5("files/${name}")]))
   })
 
   noip_env_content = templatefile("files/noip-duc.env.tftpl", {
@@ -51,11 +67,18 @@ locals {
   })
 }
 
-resource "aws_s3_object" "ss_start_script" {
+resource "aws_s3_object" "ss_backend_env" {
   bucket  = aws_s3_bucket.vpn_configs.id
-  key     = "start-ss"
-  content = local.ss_start_script_content
-  etag    = md5(local.ss_start_script_content)
+  key     = "backend.env"
+  content = local.ss_backend_env
+  etag    = md5(local.ss_backend_env)
+}
+
+resource "aws_s3_object" "ss_plugin_env" {
+  bucket  = aws_s3_bucket.vpn_configs.id
+  key     = "plugin.env"
+  content = local.ss_plugin_env
+  etag    = md5(local.ss_plugin_env)
 }
 
 resource "aws_s3_object" "noip_env" {

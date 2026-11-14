@@ -84,6 +84,13 @@ resource "aws_instance" "ec2_server" {
   vpc_security_group_ids      = [aws_security_group.sg_ssh_proxy_vpn.id]
   subnet_id                   = aws_subnet.subnet_tailscale.id
   user_data                   = var.user_data
+  user_data_replace_on_change = true
+
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 1
+  }
 
   iam_instance_profile = aws_iam_instance_profile.ec2_server.name
 

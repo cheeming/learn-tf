@@ -1,0 +1,28 @@
+[Unit]
+Description=Internet-only Shadowsocks backend
+Requires=shadowsocks-firewall.service
+After=network-online.target shadowsocks-firewall.service
+Wants=network-online.target
+
+[Service]
+User=ss-backend
+Group=ss-backend
+EnvironmentFile=/etc/shadowsocks/backend.env
+ExecStart=/usr/local/libexec/shadowsocks2 -s 127.0.0.1:8388 -cipher AEAD_CHACHA20_POLY1305
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+CapabilityBoundingSet=
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target
