@@ -108,6 +108,36 @@ TF_STATE_NAME=aws-instances;
 terraform init -backend-config="address=https://gitlab.com/api/v4/projects/71332047/terraform/state/$TF_STATE_NAME" -backend-config="lock_address=https://gitlab.com/api/v4/projects/71332047/terraform/state/$TF_STATE_NAME/lock" -backend-config="unlock_address=https://gitlab.com/api/v4/projects/71332047/terraform/state/$TF_STATE_NAME/lock" -backend-config="username=cheeming" -backend-config="password=$GITLAB_ACCESS_TOKEN" -backend-config="lock_method=POST" -backend-config="unlock_method=DELETE" -backend-config="retry_wait_min=5"
 ```
 
+Sync TLS files to GitLab CI
+--------------------------
+Keep the certificate/full chain in `files/tmpsc.net/tmpsc_net.cer` and the private
+key in `files/tmpsc.net/tmpsc_net.key`. Both files are gitignored.
+
+After Terraform succeeds, `make apply` runs `scripts/sync-ci-tls.sh` to create or
+update the project File variables `SS_TLS_CERT_FILE` and `SS_TLS_KEY_FILE` with
+these contents. This also applies to `make update_s3`, which calls `make apply`.
+The script needs `glab`, `jq`, and GitLab authentication with permission to manage
+project CI/CD variables (normally a Maintainer with an `api`-scoped token).
+
+To sync without applying infrastructure, run from `aws-instances`:
+
+```sh
+bash scripts/sync-ci-tls.sh
+# Optional destination overrides:
+bash scripts/sync-ci-tls.sh --project tmpsc/learn-tf --hostname gitlab.com --scope '*'
+```
+
+Variables are protected, raw File variables scoped to `*` by default. CI restores
+them to the expected local paths before Terraform runs; protected variables are
+available only to eligible protected refs. PEM values are multiline and cannot
+use GitLab's masked-variable setting. The script does not print their contents.
+DNS jobs skip TLS restoration.
+
+If Terraform fails, no sync runs. If syncing fails after Terraform succeeds,
+`make apply` fails but the infrastructure changes have already been applied;
+fix the reported issue and rerun the sync script directly. The two variable
+updates are separate API requests, so a partial sync can be retried this way.
+
 Summarise Terraform Plan
 ------------------------
 If you want better summaries: https://github.com/dineshba/tf-summarize

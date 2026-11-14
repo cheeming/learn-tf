@@ -11,6 +11,7 @@ check-diff:
 
 apply:
 	terraform apply tfplan && rm tfplan
+	bash scripts/sync-ci-tls.sh
 
 destroy:
 	terraform plan -destroy -out=tfplan -target=${TARGET}

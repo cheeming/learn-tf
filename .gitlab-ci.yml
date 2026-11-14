@@ -23,6 +23,15 @@ _ss_tf_base:
     TF_BACKEND_USERNAME: gitlab-ci-token
   before_script:
     - cd ${TF_STATE_NAME}
+    - |
+      if [ "$TF_STATE_NAME" = "aws-instances" ]; then
+        : "${SS_TLS_CERT_FILE:?Missing GitLab File variable SS_TLS_CERT_FILE}"
+        : "${SS_TLS_KEY_FILE:?Missing GitLab File variable SS_TLS_KEY_FILE}"
+        umask 077
+        mkdir -p files/tmpsc.net
+        cp "$SS_TLS_CERT_FILE" files/tmpsc.net/tmpsc_net.cer
+        cp "$SS_TLS_KEY_FILE" files/tmpsc.net/tmpsc_net.key
+      fi
     - terraform init -backend-config="address=https://gitlab.com/api/v4/projects/71332047/terraform/state/${TF_STATE_NAME}" -backend-config="lock_address=https://gitlab.com/api/v4/projects/71332047/terraform/state/${TF_STATE_NAME}/lock" -backend-config="unlock_address=https://gitlab.com/api/v4/projects/71332047/terraform/state/${TF_STATE_NAME}/lock" -backend-config="username=${TF_BACKEND_USERNAME}" -backend-config="password=${CI_JOB_TOKEN}" -backend-config="lock_method=POST" -backend-config="unlock_method=DELETE" -backend-config="retry_wait_min=5"
   script:
     - terraform plan -target=module.shadowsock_$[[ inputs.ss_location ]].aws_instance.ec2_server
