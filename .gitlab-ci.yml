@@ -9,7 +9,6 @@ spec:
 ---
 stages:
   - deploy
-  - test
 
 _ss_tf_base:
   stage: deploy
@@ -58,27 +57,6 @@ ss_tf_apply:
       dotenv: ${TF_STATE_NAME}/ss_ip.env
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule" && "$[[ inputs.schedule_job ]]" == 'ss_tf_apply'
-    - if: $CI_PIPELINE_SOURCE == "schedule"
-      when: never
-    - when: manual
-
-ss_connectivity_check:
-  stage: test
-  image:
-    name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/alpine:3.20
-    entrypoint: [""]
-  needs:
-    - job: ss_tf_apply
-      artifacts: true
-  script:
-    - sleep 10
-    - cd aws-instances
-    - ./scripts/test_connect_ss.sh "$SS_IP_ADDRESS"
-  retry: 1
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "schedule" && "$[[ inputs.schedule_job ]]" == 'ss_tf_apply'
-      when: delayed
-      start_in: 300 seconds
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: never
     - when: manual

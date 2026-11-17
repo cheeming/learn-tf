@@ -62,8 +62,11 @@ resource "aws_security_group" "sg_ssh_proxy_vpn" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "allow_in_ipv4_https" {
+  for_each = var.ss_allowed_ipv4_cidrs
+
   security_group_id = aws_security_group.sg_ssh_proxy_vpn.id
-  cidr_ipv4         = "0.0.0.0/0"
+  description       = "Shadowsocks TCP 443 from ${each.value}"
+  cidr_ipv4         = each.value
   from_port         = 443
   ip_protocol       = "tcp"
   to_port           = 443

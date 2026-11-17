@@ -10,17 +10,47 @@ Server access and connectivity
 ------------------------------
 Bootstrap purges the SSH server and masks both its service and socket. Instances
 have no EC2 SSH key pair or SSH ingress rule, and the SSM agent is removed to
-reduce memory usage. TCP 443 is the only permitted inbound port.
+reduce memory usage. TCP 443 is the only permitted inbound port, restricted in
+every region to the module input `ss_allowed_ipv4_cidrs`. All seven regions
+inherit its defaults from `modules/tailscale-exit-node/variables.tf`:
 
-The GitLab connectivity check verifies that TCP 443 is reachable and TCP 22 is
-inaccessible. To run it manually:
+| Source CIDR | Allowed source addresses |
+| --- | --- |
+| `112.114.246.0/23` | `112.114.246.0` through `112.114.247.255` |
+| `60.160.102.0/23` | `60.160.102.0` through `60.160.103.255` |
+| `106.61.170.0/23` | `106.61.170.0` through `106.61.171.255` |
+
+Each range permits 512 addresses, including other ISP subscribers. Future home
+or mobile assignments may fall outside these ranges and require an allowlist
+update. Edit the module defaults to update all regions, or set
+`ss_allowed_ipv4_cidrs` explicitly in an individual module block to override it
+for that region. There is no root-level `TF_VAR_ss_allowed_ipv4_cidrs` input.
+Empty sets, IPv6 CIDRs, and unrestricted `/0` are rejected.
+
+From an allowed network, verify that TCP 443 is reachable and TCP 22 is
+inaccessible (the default mode remains `reachable`):
 ```
-./scripts/test_connect_ss.sh <hostname>
+./scripts/test_connect_ss.sh <hostname> reachable
 ```
 
-When deploying the SSH removal, review and apply a full Terraform plan once to
-remove existing SSH ingress rules and key-pair resources. The scheduled jobs
-target only the EC2 instance and do not reconcile those removed resources.
+Connectivity checks are run manually, not by GitLab CI. From an outside network,
+verify that neither port is reachable:
+```
+./scripts/test_connect_ss.sh <hostname> blocked
+```
+
+A blocked result alone does not prove the server is healthy or that a security
+group caused the failure; an offline host or network/DNS failure can also make
+connections fail. Pair it with the positive check from an allowed network and
+a full client TLS/WebSocket/SOCKS connection.
+
+For the initial allowlist rollout and later allowlist updates, review and apply a
+full Terraform plan (without `-target`). Confirm removal of the old unrestricted
+TCP 443 rule and creation of one rule per allowed CIDR in all seven regions.
+Also reconcile any old SSH ingress rules and key-pair resources. Scheduled jobs
+target only the EC2 instance and do not reconcile standalone ingress-rule changes.
+The allowlist change itself does not require replacing instances or changing
+bootstrap assets. Other attached security groups must not grant broader ingress.
 
 Internet-only Shadowsocks isolation
 -----------------------------------
@@ -75,6 +105,7 @@ Offline checks (no AWS requests or deployment):
 terraform fmt -check -recursive
 terraform validate
 python3 -B -m unittest discover -s scripts/tests -p test_proxy_templates.py -v
+python3 -B -m unittest discover -s scripts/tests -p test_connect_ss.py -v
 ```
 
 Linux acceptance checks, to be run separately on a bootstrapped test host:

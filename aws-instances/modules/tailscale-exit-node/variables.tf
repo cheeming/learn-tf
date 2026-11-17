@@ -1,3 +1,22 @@
+variable "ss_allowed_ipv4_cidrs" {
+  description = "Public IPv4 source CIDRs permitted to reach Shadowsocks TCP 443"
+  type        = set(string)
+  nullable    = false
+  default = [
+    "112.114.246.0/23",
+    "60.160.102.0/23",
+    "106.61.170.0/23",
+  ]
+
+  validation {
+    condition = length(var.ss_allowed_ipv4_cidrs) > 0 && alltrue([
+      for cidr in var.ss_allowed_ipv4_cidrs :
+      can(cidrnetmask(cidr)) && try(tonumber(split("/", cidr)[1]) > 0, false)
+    ])
+    error_message = "Provide a nonempty set of valid IPv4 CIDRs; unrestricted /0 access is not permitted."
+  }
+}
+
 variable "aws_region" {
   description = "The AWS region"
   type        = string
